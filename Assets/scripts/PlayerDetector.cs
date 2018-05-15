@@ -5,6 +5,7 @@ using UnityEngine;
 public class PlayerDetector : MonoBehaviour
 {
     public bool detected;
+    public float xpos;
     // Use this for initialization
     void Start()
     {
@@ -30,6 +31,7 @@ public class PlayerDetector : MonoBehaviour
                 else
                 {
                     detected = true;
+                    xpos = other.transform.position.x;
                 }
             }
             else if (other.gameObject.GetComponent<Birdmove>())
@@ -41,6 +43,7 @@ public class PlayerDetector : MonoBehaviour
                 else
                 {
                     detected = true;
+                    xpos = other.transform.position.x;
                 }
             }
         }

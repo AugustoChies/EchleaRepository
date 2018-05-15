@@ -24,11 +24,14 @@ public class PlayerObjsScript : NetworkBehaviour {
 	void Update () {
 		if(!started)
         {
-            if (SceneManager.GetActiveScene().name == "Stage1")
+            if (isLocalPlayer)
             {
-                started = true;
-                CmdSpawnPlayer();
-            }           
+                if (SceneManager.GetActiveScene().name == "Stage1")
+                {
+                    started = true;
+                    CmdSpawnPlayer();
+                }
+            }
         }
         if (this.transform.childCount > 1)
         {
@@ -144,6 +147,20 @@ public class PlayerObjsScript : NetworkBehaviour {
             CmdShootSpine(caller, direction);
     }
 
+    public void ChangeClaw(GameObject caller, bool direction, bool attacking)
+    {
+        objectID = caller;
+
+        CmdChangeSandClaw(caller, direction,attacking);
+    }
+
+    public void DropBall(GameObject caller)
+    {
+        objectID = caller;
+
+        CmdDropBall(caller);
+    }
+
     public void CallCurse(GameObject caller)
     {
         objectID = caller;
@@ -253,8 +270,21 @@ public class PlayerObjsScript : NetworkBehaviour {
     {
         NetworkIdentity objNetId = caller.GetComponent<NetworkIdentity>();
         objNetId.AssignClientAuthority(connectionToClient);
-        caller.GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
-        caller.GetComponent<EspinhosoScript>().stunned = true;
+        
+        if (caller.GetComponent<EspinhosoScript>())
+        {
+            caller.GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
+            caller.GetComponent<EspinhosoScript>().stunned = true;
+        }
+        else if (caller.GetComponent<OwlScript>())
+        {
+            caller.GetComponent<OwlScript>().stunned = true;
+        }
+        else if (caller.GetComponent<Clawscrip>())
+        {
+            caller.GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
+            caller.GetComponent<Clawscrip>().stunned = true;
+        }
         objNetId.RemoveClientAuthority(connectionToClient);
     }
 
@@ -270,6 +300,76 @@ public class PlayerObjsScript : NetworkBehaviour {
         else
             instance.GetComponent<Rigidbody2D>().AddForce(new Vector2(-700, 100));
         NetworkServer.Spawn(instance);
+        objNetId.RemoveClientAuthority(connectionToClient);
+    }
+
+    [Command]
+    void CmdDropBall(GameObject caller)
+    {
+        NetworkIdentity objNetId = caller.GetComponent<NetworkIdentity>();
+        objNetId.AssignClientAuthority(connectionToClient);
+        caller.GetComponent<OwlScript>().attacktimer = 2.5f;
+        GameObject instance1 = Instantiate(caller.GetComponent<OwlScript>().spine, caller.transform.position + new Vector3(0.5f, 0.5f, 0), Quaternion.identity);
+        GameObject instance2 = Instantiate(caller.GetComponent<OwlScript>().spine, caller.transform.position + new Vector3(-0.5f, 0.5f, 0), Quaternion.identity);
+        
+        instance1.GetComponent<Rigidbody2D>().AddForce(new Vector2(Random.Range(1,100), Random.Range(50,200)));
+        instance2.GetComponent<Rigidbody2D>().AddForce(new Vector2(-Random.Range(1, 100), Random.Range(50, 200)));
+        NetworkServer.Spawn(instance1);
+        NetworkServer.Spawn(instance2);
+        objNetId.RemoveClientAuthority(connectionToClient);
+    }
+
+    [ClientRpc]
+    void RpcUpdateSandEnabled(GameObject caller, bool attacking)
+    {
+        if(attacking)
+        {
+            caller.GetComponent<SpriteRenderer>().enabled = true;
+            caller.GetComponent<BoxCollider2D>().enabled = true;
+        }
+        else
+        {
+            caller.GetComponent<SpriteRenderer>().enabled = false;
+            caller.GetComponent<BoxCollider2D>().enabled = false;
+        }
+    }
+
+    [Command]
+    void CmdChangeSandClaw(GameObject caller,bool direction, bool attacking)
+    {
+        NetworkIdentity objNetId = caller.GetComponent<NetworkIdentity>();
+        objNetId.AssignClientAuthority(connectionToClient);
+        
+        caller.GetComponent<Clawscrip>().direction = direction;
+
+
+
+        if(attacking)
+        {
+            caller.GetComponent<Clawscrip>().attacktimer = 5f;
+            caller.GetComponent<Clawscrip>().attacking = true;
+            caller.GetComponent<SpriteRenderer>().enabled = true;
+            caller.GetComponent<BoxCollider2D>().enabled = true;
+            RpcUpdateSandEnabled(caller, attacking);
+        }
+        else
+        {
+            if (direction)
+            {
+                this.transform.Translate(-0.5f, 0, 0);
+            }
+            else
+            {
+                this.transform.Translate(0.5f, 0, 0);
+            }
+            caller.GetComponent<Clawscrip>().attacking = false;
+            caller.GetComponent<SpriteRenderer>().enabled = false;
+            caller.GetComponent<BoxCollider2D>().enabled = false;
+            caller.GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
+            RpcUpdateSandEnabled(caller, attacking);
+        }
+
+
         objNetId.RemoveClientAuthority(connectionToClient);
     }
 

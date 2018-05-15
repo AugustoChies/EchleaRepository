@@ -72,7 +72,7 @@ public class digsitescript : NetworkBehaviour
         {
             if (!dug)
             {
-                
+                    
                     dug = true;
                     Dug();
                 

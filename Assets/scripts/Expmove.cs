@@ -10,7 +10,7 @@ public class Expmove : NetworkBehaviour
     public float speed;
     public float jumpvalue;
     public float xrope;
-    float restimer;
+    
     public float horizontal, vertical;
     public GameObject attack, scan, revival, myparent, bird;
     Transform maincamera;
@@ -30,7 +30,7 @@ public class Expmove : NetworkBehaviour
         maincamera = Camera.main.transform;
         canmove = true;
         attacktimer = scantimer = -1;
-        restimer = 0;
+       
     }
 
     // Update is called once per frame
@@ -207,7 +207,7 @@ public class Expmove : NetworkBehaviour
 
         if(reviving)
         {
-            if (!onfriendrevival)
+            if (!onfriendrevival || dead)
                 reviving = false;
         }
 
@@ -260,6 +260,10 @@ public class Expmove : NetworkBehaviour
             if (other.gameObject.tag == "curse")
             {
                 myparent.GetComponent<PlayerObjsScript>().Lose();
+            }
+            if (other.gameObject.tag == "enemy")
+            {
+                CmdLifeStatus(true);
             }
             if (other.gameObject.tag == "door")
             {                
@@ -380,6 +384,18 @@ public class Expmove : NetworkBehaviour
     {        
         if (amiserver && amilocalplayer)
             myparent.GetComponent<PlayerObjsScript>().ShootSpine(caller,direction);
+    }
+
+    public void DropBall(GameObject caller)
+    {
+        if (amiserver && amilocalplayer)
+            myparent.GetComponent<PlayerObjsScript>().DropBall(caller);
+    }
+
+    public void ChangeClaw(GameObject caller, bool direction, bool attacking)
+    {
+        if (amiserver && amilocalplayer)
+            myparent.GetComponent<PlayerObjsScript>().ChangeClaw(caller,direction,attacking);
     }
 
     public void CallCurse(GameObject caller)

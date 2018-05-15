@@ -177,7 +177,7 @@ public class Birdmove : NetworkBehaviour {
 
         if (reviving)
         {
-            if (!onfriendrevival)
+            if (!onfriendrevival || dead)
                 reviving = false;
         }
     }
@@ -196,6 +196,10 @@ public class Birdmove : NetworkBehaviour {
                         CmdIAmReviving();
                     }
                 }
+            }
+            if (other.gameObject.tag == "enemy")
+            {
+                CmdLifeStatus(true);
             }
         }
     }
@@ -301,6 +305,18 @@ public class Birdmove : NetworkBehaviour {
     {
         if (amiserver && amilocalplayer)
             myparent.GetComponent<PlayerObjsScript>().ShootSpine(caller, direction);
+    }
+
+    public void DropBall(GameObject caller)
+    {
+        if (amiserver && amilocalplayer)
+            myparent.GetComponent<PlayerObjsScript>().DropBall(caller);
+    }
+
+    public void ChangeClaw(GameObject caller, bool direction, bool attacking)
+    {
+        if (amiserver && amilocalplayer)
+            myparent.GetComponent<PlayerObjsScript>().ChangeClaw(caller, direction, attacking);
     }
 
     public void CallCurse(GameObject caller)
