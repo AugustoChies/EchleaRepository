@@ -12,11 +12,14 @@ public class Expmove : NetworkBehaviour
     public float xrope;
     
     public float horizontal, vertical;
-    public GameObject attack, scan, revival, myparent, bird;
+    public GameObject attack, scan, revival, myparent, bird, pointer;
+    public float distresstimer;
     Transform maincamera;
    // GameObject actualrope;
     [SyncVar]
     public bool reviving;
+    [SyncVar]
+    public bool distress;
 
     public bool onfriendrevival;
 
@@ -30,7 +33,7 @@ public class Expmove : NetworkBehaviour
         maincamera = Camera.main.transform;
         canmove = true;
         attacktimer = scantimer = -1;
-       
+        distresstimer = 0;
     }
 
     // Update is called once per frame
@@ -169,6 +172,11 @@ public class Expmove : NetworkBehaviour
             }         
         }
 
+        if (Input.GetKeyDown("p"))
+        {
+            CmdDistress(true);
+        }
+
         if (scantimer >= 0)
         {
             scantimer += 1 * Time.deltaTime;
@@ -205,7 +213,26 @@ public class Expmove : NetworkBehaviour
             }
         }
 
-        if(reviving)
+        if (distress)
+        {
+            distresstimer += 1 * Time.deltaTime;
+            if (distresstimer > 3f)
+            {
+                CmdDistress(false);
+                distresstimer = 0;
+            }
+        }
+
+        if (bird!= null && bird.GetComponent<Birdmove>().distress)
+        {
+            pointer.GetComponent<SpriteRenderer>().enabled = true;
+        }
+        else
+        {
+            pointer.GetComponent<SpriteRenderer>().enabled = false;
+        }
+
+        if (reviving)
         {
             if (!onfriendrevival || dead)
                 reviving = false;
@@ -216,6 +243,7 @@ public class Expmove : NetworkBehaviour
             if(bird.GetComponent<Birdmove>().reviving)
             {
                 CmdLifeStatus(false);
+                CmdDistress(false);
             }
         }
 
@@ -264,6 +292,7 @@ public class Expmove : NetworkBehaviour
             if (other.gameObject.tag == "enemy")
             {
                 CmdLifeStatus(true);
+                CmdDistress(true);
             }
             if (other.gameObject.tag == "door")
             {                
@@ -301,11 +330,13 @@ public class Expmove : NetworkBehaviour
             if (coll.gameObject.tag == "enemyattack")
             {
                 CmdLifeStatus(true);
+                CmdDistress(true);
             }
 
             if (coll.gameObject.tag == "chao" && vspeed <= -12)
             {
                 CmdLifeStatus(true);
+                CmdDistress(true);
             }
         
     }
@@ -340,6 +371,20 @@ public class Expmove : NetworkBehaviour
     void CmdIAmReviving()
     {
         reviving = true;
+    }
+
+    [ClientRpc]
+    void RpcDistress(bool emmmiting)
+    {
+        distress = emmmiting;
+        distresstimer = 0;
+    }
+
+    [Command]
+    void CmdDistress(bool emmmiting)
+    {
+        distress = emmmiting;
+        RpcDistress(emmmiting);
     }
 
     //COMANDOS DE TERCEIROS-------------------------------------------------------------------------------------------------

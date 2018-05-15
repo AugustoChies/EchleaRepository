@@ -8,13 +8,16 @@ public class Birdmove : NetworkBehaviour {
     public float speed;
     bool amilocalplayer, amiserver;
     int horizontal, vertical;
-    public GameObject rope, attack, scan, revival, myparent, explorer,load, inventory;
+    public GameObject rope, attack, scan, revival, myparent, explorer,load, inventory, pointer;
     float restimer;
+    public float distresstimer;
     Transform maincamera;
     [SyncVar]
     public bool reviving;
     [SyncVar]
     public bool carrying;
+    [SyncVar]
+    public bool distress;
     [SyncVar]
     public int relicindex;//0 é chave
 
@@ -31,6 +34,7 @@ public class Birdmove : NetworkBehaviour {
         canmove = true;
         attacktimer = scantimer = -1;
         relicindex = 0;
+        distresstimer = 0;
     }
 
     // Update is called once per frame
@@ -152,6 +156,11 @@ public class Birdmove : NetworkBehaviour {
             }
         }
 
+        if (Input.GetKeyDown("p"))
+        {
+            CmdDistress(true);
+        }
+
 
         if (scantimer >= 0)
         {
@@ -163,6 +172,25 @@ public class Birdmove : NetworkBehaviour {
                 scan.GetComponent<SpriteRenderer>().enabled = false;
                 scantimer = -1;
             }           
+        }
+
+        if (distress)
+        {
+            distresstimer += 1 * Time.deltaTime;
+            if (distresstimer > 3f)
+            {
+                CmdDistress(false);
+                distresstimer = 0;
+            }
+        }
+
+        if (explorer != null && explorer.GetComponent<Expmove>().distress)
+        {
+            pointer.GetComponent<SpriteRenderer>().enabled = true;
+        }
+        else
+        {
+            pointer.GetComponent<SpriteRenderer>().enabled = false;
         }
 
 
@@ -184,11 +212,13 @@ public class Birdmove : NetworkBehaviour {
             {
                 restimer = 0;
                 CmdLifeStatus(false);
+                CmdDistress(false);
             }
             if (explorer.GetComponent<Expmove>().reviving)
             {
                 restimer = 0;
                 CmdLifeStatus(false);
+                CmdDistress(false);
             }
         }
 
@@ -217,6 +247,7 @@ public class Birdmove : NetworkBehaviour {
             if (other.gameObject.tag == "enemy")
             {
                 CmdLifeStatus(true);
+                CmdDistress(true);
             }
             if (other.gameObject.tag == "delivery")
             {
@@ -243,6 +274,7 @@ public class Birdmove : NetworkBehaviour {
             if (coll.gameObject.tag == "enemyattack")
             {
                  CmdLifeStatus(true);
+                 CmdDistress(true);
                  this.gameObject.GetComponent<Rigidbody2D>().AddForce(new Vector2(-100, 0));
             }
             if (coll.gameObject.tag == "chao")
@@ -301,6 +333,20 @@ public class Birdmove : NetworkBehaviour {
     void CmdIAmReviving()
     {
         reviving = true;
+    }
+
+    [ClientRpc]
+    void RpcDistress(bool emmmiting)
+    {
+        distress = emmmiting;
+        distresstimer = 0;
+    }
+
+    [Command]
+    void CmdDistress(bool emmmiting)
+    {
+        distress = emmmiting;
+        RpcDistress(emmmiting);
     }
 
     //COMANDOS DE TERCEIROS-------------------------------------------------------------------------------------------------
