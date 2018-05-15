@@ -70,11 +70,20 @@ public class digsitescript : NetworkBehaviour
         
         if (other.gameObject.tag == "ataquebi")
         {
-            if (!dug)
+            if (!dug && !bird.GetComponent<Birdmove>().carrying)
             {
-                    
+                if (type == 0 || type == 1)
+                {
                     dug = true;
                     Dug();
+                }
+                else
+                {
+                    
+                    dug = true;
+                    BirdDug();
+                    
+                }
                 
 
             }
@@ -115,6 +124,31 @@ public class digsitescript : NetworkBehaviour
         }
 
         if(explorer != null)
+            explorer.GetComponent<Expmove>().Dig(this.gameObject);
+        if (bird != null)
+            bird.GetComponent<Birdmove>().Dig(this.gameObject);
+    }
+
+    void BirdDug()
+    {
+        Debug.Log("here");
+        if (type == 1)
+        {
+            inventory.GetComponent<Inventoryscr>().sendInfo(-2);
+        }
+        else if (type == 0)
+        {
+            inventory.GetComponent<Inventoryscr>().sendInfo(-1);
+        }
+        else
+        { 
+            if(type == 3)
+                bird.GetComponent<Birdmove>().Changecarrying(true,relindex);
+            else
+                bird.GetComponent<Birdmove>().Changecarrying(true, 0);
+        }
+        
+        if (explorer != null)
             explorer.GetComponent<Expmove>().Dig(this.gameObject);
         if (bird != null)
             bird.GetComponent<Birdmove>().Dig(this.gameObject);

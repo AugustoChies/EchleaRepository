@@ -8,11 +8,15 @@ public class Birdmove : NetworkBehaviour {
     public float speed;
     bool amilocalplayer, amiserver;
     int horizontal, vertical;
-    public GameObject rope, attack, scan, revival, myparent, explorer;
+    public GameObject rope, attack, scan, revival, myparent, explorer,load, inventory;
     float restimer;
     Transform maincamera;
     [SyncVar]
     public bool reviving;
+    [SyncVar]
+    public bool carrying;
+    [SyncVar]
+    public int relicindex;//0 é chave
 
     public bool onfriendrevival;
 
@@ -25,7 +29,8 @@ public class Birdmove : NetworkBehaviour {
                
         maincamera = Camera.main.transform;
         canmove = true;
-        attacktimer = scantimer = -1;        
+        attacktimer = scantimer = -1;
+        relicindex = 0;
     }
 
     // Update is called once per frame
@@ -86,6 +91,18 @@ public class Birdmove : NetworkBehaviour {
         if(explorer == null)
         {
             explorer = GameObject.Find("Explorer(Clone)");
+        }
+        if (inventory == null)
+        {
+            inventory = GameObject.Find("InventoryInfo");
+        }
+        if (carrying)
+        {
+            load.GetComponent<SpriteRenderer>().enabled = true;
+        }
+        else
+        {
+            load.GetComponent<SpriteRenderer>().enabled = false;
         }
         if (!amilocalplayer)
         {
@@ -201,6 +218,15 @@ public class Birdmove : NetworkBehaviour {
             {
                 CmdLifeStatus(true);
             }
+            if (other.gameObject.tag == "delivery")
+            {
+                if (carrying)
+                {
+                    inventory.GetComponent<Inventoryscr>().sendInfo(relicindex);
+                    carrying = false;
+                    CmdCarrying(false, 0);
+                }
+            }
         }
     }
 
@@ -213,8 +239,7 @@ public class Birdmove : NetworkBehaviour {
     }
 
     void OnCollisionEnter2D(Collision2D coll)
-    {
-        
+    {        
             if (coll.gameObject.tag == "enemyattack")
             {
                  CmdLifeStatus(true);
@@ -228,7 +253,22 @@ public class Birdmove : NetworkBehaviour {
         
     }
 
+    public void Changecarrying(bool carring, int relindex)
+    {        
+        if (amilocalplayer)
+        {           
+            carrying = carring;
+            relicindex = relindex;
+            CmdCarrying(carring, relindex);
+        }
+    }
 
+    [Command]
+    void CmdCarrying(bool carr, int ri)
+    {
+        carrying = carr;
+        relicindex = ri;
+    }
 
     [ClientRpc]
     void RpcLifeStatus(bool isitdead)

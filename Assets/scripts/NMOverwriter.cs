@@ -7,6 +7,8 @@ public class NMOverwriter : NetworkManager
 {
     public GameObject explorer, bird, playerobj;
     public GameObject[] spawners;
+    GameObject player;
+    GameObject player2;
     int spawncount = 0;
 
     
@@ -14,18 +16,21 @@ public class NMOverwriter : NetworkManager
 
     public override void OnServerAddPlayer(NetworkConnection conn, short playerControllerId)
     {
-        GameObject player = playerobj;
+        player = playerobj;
+        player2 = playerobj;
         if (spawncount % 2 == 0)
         {
             player.GetComponent<PlayerObjsScript>().mychar = explorer;
             player = (GameObject)GameObject.Instantiate(player, spawners[0].transform.position, Quaternion.identity);
+            NetworkServer.AddPlayerForConnection(conn, player, playerControllerId);
         }
         else
         {
-            player.GetComponent<PlayerObjsScript>().mychar = bird;
-            player = (GameObject)GameObject.Instantiate(player, spawners[1].transform.position, Quaternion.identity);
+            player2.GetComponent<PlayerObjsScript>().mychar = bird;
+            player2 = (GameObject)GameObject.Instantiate(player, spawners[1].transform.position, Quaternion.identity);
+            NetworkServer.AddPlayerForConnection(conn, player2, playerControllerId);
         }
-        NetworkServer.AddPlayerForConnection(conn, player, playerControllerId);
+        
         spawncount++;
     }
 }

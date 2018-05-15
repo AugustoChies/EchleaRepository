@@ -54,12 +54,12 @@ public class PlayerObjsScript : NetworkBehaviour {
             if(mychar.name == "Explorer")
             {
                 instanced = GameObject.Find("Explorer(Clone)");
-                instanced.transform.SetParent(this.transform);
+               // instanced.transform.SetParent(this.transform);
             }
             else if (mychar.name == "Bird")
             {
                 instanced = GameObject.Find("Bird(Clone)");
-                instanced.transform.SetParent(this.transform);
+               // instanced.transform.SetParent(this.transform);
             }
         }
     }
