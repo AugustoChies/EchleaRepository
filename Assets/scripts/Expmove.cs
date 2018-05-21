@@ -226,6 +226,16 @@ public class Expmove : NetworkBehaviour
         if (bird!= null && bird.GetComponent<Birdmove>().distress)
         {
             pointer.GetComponent<SpriteRenderer>().enabled = true;
+
+            Vector3 targ = bird.transform.position;
+            
+
+            Vector3 objectPos = pointer.transform.position;
+            targ = targ - objectPos;
+            
+
+            float angle = Mathf.Atan2(targ.y, targ.x) * Mathf.Rad2Deg;
+            pointer.transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle - 90));
         }
         else
         {

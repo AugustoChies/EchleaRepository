@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class MenuCanvas : MonoBehaviour {
 
@@ -18,7 +19,7 @@ public class MenuCanvas : MonoBehaviour {
 
     public void Start_Button()
     {
-        //nada ainda
+        SceneManager.LoadScene("Playing");
     }
 
     public void Credits_Button()
