@@ -8,16 +8,19 @@ public class PlayerObjsScript : NetworkBehaviour {
     public GameObject mychar,instanced;
     [SyncVar]
     private GameObject objectID;
-    bool started;
+    public bool started;
     [SyncVar]
     public GameObject inventory;
     GameObject actualrope;
-
     public GameObject canvas;
+
+    //coisas do char select
+    public GameObject selectcanvas,selectcontroller;
+    public bool didIClick;
 
     // Use this for initialization
     void Start () {
-		
+        started = false;
 	}
 	
 	// Update is called once per frame
@@ -26,40 +29,62 @@ public class PlayerObjsScript : NetworkBehaviour {
         {
             if (isLocalPlayer)
             {
+                started = true;
                 if (SceneManager.GetActiveScene().name == "Stage1")
-                {
-                    started = true;
+                {                    
                     CmdSpawnPlayer();
                 }
             }
         }
-        if (this.transform.childCount > 1)
+        if (started)
         {
-            if(transform.Find("Bird(Clone)"))
+            if(SceneManager.GetActiveScene().name == "CharacterSelect")
             {
-                Transform shine = transform.Find("Bird(Clone)");
-                Destroy(shine.gameObject);
-            }
-            if (transform.Find("Explorer(Clone)"))
-            {
-                Transform shine = transform.Find("Explorer(Clone)");
-                Destroy(shine.gameObject);
-            }
-        }
-        if (canvas == null)
-            canvas = GameObject.Find("Statistics");
+                if (selectcanvas == null)
+                    selectcanvas = GameObject.Find("SCanvas");
+                if (selectcontroller == null)
+                    selectcontroller = GameObject.Find("ChangeController");
+                if(selectcontroller.GetComponent<SwapNetwork>().mypobject == null)
+                {
+                    selectcontroller.GetComponent<SwapNetwork>().mypobject = this.gameObject;
+                }
 
-        if(instanced == null)
-        {
-            if(mychar.name == "Explorer")
-            {
-                instanced = GameObject.Find("Explorer(Clone)");
-               // instanced.transform.SetParent(this.transform);
+                if(selectcontroller.GetComponent<SwapNetwork>().clicked && didIClick)
+                {
+                    selectcanvas.GetComponent<MenuPlayScript>().ShowWait();
+                }
             }
-            else if (mychar.name == "Bird")
+            if (SceneManager.GetActiveScene().name == "Stage1")
             {
-                instanced = GameObject.Find("Bird(Clone)");
-               // instanced.transform.SetParent(this.transform);
+                if (this.transform.childCount > 1)
+                {
+                    if (transform.Find("Bird(Clone)"))
+                    {
+                        Transform shine = transform.Find("Bird(Clone)");
+                        Destroy(shine.gameObject);
+                    }
+                    if (transform.Find("Explorer(Clone)"))
+                    {
+                        Transform shine = transform.Find("Explorer(Clone)");
+                        Destroy(shine.gameObject);
+                    }
+                }
+                if (canvas == null)
+                    canvas = GameObject.Find("Statistics");
+
+                if (instanced == null)
+                {
+                    if (mychar.name == "Explorer")
+                    {
+                        instanced = GameObject.Find("Explorer(Clone)");
+                        // instanced.transform.SetParent(this.transform);
+                    }
+                    else if (mychar.name == "Bird")
+                    {
+                        instanced = GameObject.Find("Bird(Clone)");
+                        // instanced.transform.SetParent(this.transform);
+                    }
+                }
             }
         }
     }
@@ -97,6 +122,16 @@ public class PlayerObjsScript : NetworkBehaviour {
     }
 
     //COMMANDS_______________________________________________________________________________________________
+    public void UpdateClicked(GameObject caller,bool value)
+    {
+        if (isLocalPlayer)
+        {
+            objectID = caller;
+            didIClick = value;
+            CmdUpdateClicked(objectID, value);
+        }
+    }
+
 
     public void ShowIcon(GameObject caller)
     {
@@ -188,6 +223,14 @@ public class PlayerObjsScript : NetworkBehaviour {
         CmdDestroyRope();
     }
 
+    [Command]
+    void CmdUpdateClicked(GameObject caller,bool value)
+    {
+        NetworkIdentity objNetId = caller.GetComponent<NetworkIdentity>();
+        objNetId.AssignClientAuthority(connectionToClient);
+        caller.GetComponent<SwapNetwork>().clicked = value;
+        objNetId.RemoveClientAuthority(connectionToClient);
+    }
 
 
     [Command]

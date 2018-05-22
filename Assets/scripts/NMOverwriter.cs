@@ -6,7 +6,7 @@ using UnityEngine.Networking;
 public class NMOverwriter : NetworkManager
 {
     public GameObject explorer, bird, playerobj;
-    public GameObject[] spawners;
+    public GameObject char1, char2;
     GameObject player;
     GameObject player2;
     int spawncount = 0;
@@ -20,17 +20,49 @@ public class NMOverwriter : NetworkManager
         player2 = playerobj;
         if (spawncount % 2 == 0)
         {
-            player.GetComponent<PlayerObjsScript>().mychar = explorer;
-            player = (GameObject)GameObject.Instantiate(player, spawners[0].transform.position, Quaternion.identity);
+            player.GetComponent<PlayerObjsScript>().mychar = char1;
+            player = (GameObject)GameObject.Instantiate(player, new Vector3(0,0,0), Quaternion.identity);
             NetworkServer.AddPlayerForConnection(conn, player, playerControllerId);
         }
         else
         {
-            player2.GetComponent<PlayerObjsScript>().mychar = bird;
-            player2 = (GameObject)GameObject.Instantiate(player, spawners[1].transform.position, Quaternion.identity);
+            player2.GetComponent<PlayerObjsScript>().mychar = char2;
+            player2 = (GameObject)GameObject.Instantiate(player2, new Vector3(0, 0, 0), Quaternion.identity);
             NetworkServer.AddPlayerForConnection(conn, player2, playerControllerId);
         }
         
         spawncount++;
+    }
+
+    public void DisconnectCall()
+    {        
+        NetworkManager.singleton.StopHost();
+        MasterServer.UnregisterHost();
+    }
+
+    public void SwapChars()
+    {
+        if(char1.GetComponent<Expmove>())
+        {
+            char1 = bird;
+        }
+        else
+        {
+            char1 = explorer;
+        }
+
+        if (char2.GetComponent<Expmove>())
+        {
+            char2 = bird;
+        }
+        else
+        {
+            char2 = explorer;
+        }
+    }
+
+    public void ChangeScene(string name)
+    {
+        ServerChangeScene(name);
     }
 }

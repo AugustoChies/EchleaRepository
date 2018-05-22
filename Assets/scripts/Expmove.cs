@@ -250,7 +250,7 @@ public class Expmove : NetworkBehaviour
 
         if(dead)
         {
-            if(bird.GetComponent<Birdmove>().reviving)
+            if(bird != null && bird.GetComponent<Birdmove>().reviving)
             {
                 CmdLifeStatus(false);
                 CmdDistress(false);

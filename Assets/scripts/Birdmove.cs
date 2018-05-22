@@ -224,7 +224,7 @@ public class Birdmove : NetworkBehaviour {
                 CmdLifeStatus(false);
                 CmdDistress(false);
             }
-            if (explorer.GetComponent<Expmove>().reviving)
+            if (explorer != null && explorer.GetComponent<Expmove>().reviving)
             {
                 restimer = 0;
                 CmdLifeStatus(false);
