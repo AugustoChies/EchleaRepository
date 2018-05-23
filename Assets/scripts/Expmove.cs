@@ -25,7 +25,7 @@ public class Expmove : NetworkBehaviour
 
     bool direction; //0 left, 1 right
     float scantimer, attacktimer;
-
+    GameObject spawn;
     public float vspeed;
     // Use this for initialization
     void Start()
@@ -125,6 +125,11 @@ public class Expmove : NetworkBehaviour
         if(bird == null)
         {
             bird = GameObject.Find("Bird(Clone)");
+        }
+        if (spawn == null)
+        {
+            spawn = GameObject.Find("SpawnExplorer");
+            this.transform.position = spawn.transform.position;
         }
         if (!amilocalplayer)
         {

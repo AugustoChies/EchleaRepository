@@ -13,9 +13,10 @@ public class PlayerObjsScript : NetworkBehaviour {
     public GameObject inventory;
     GameObject actualrope;
     public GameObject canvas;
-
+    public GameObject netmanager;
     //coisas do char select
     public GameObject selectcanvas,selectcontroller;
+    [SyncVar]
     public bool didIClick;
 
     // Use this for initialization
@@ -53,8 +54,21 @@ public class PlayerObjsScript : NetworkBehaviour {
                 {
                     selectcanvas.GetComponent<MenuPlayScript>().ShowWait();
                 }
+                else if(selectcontroller.GetComponent<SwapNetwork>().clicked && !didIClick)
+                {
+                    selectcanvas.GetComponent<MenuPlayScript>().ShowReq();
+                }
             }
-            if (SceneManager.GetActiveScene().name == "Stage1")
+            else if(SceneManager.GetActiveScene().name == "WinScreen" || SceneManager.GetActiveScene().name == "LoseScreen")
+            {
+                if (selectcontroller == null)
+                    selectcontroller = GameObject.Find("ChangeController");
+                if (selectcontroller.GetComponent<SwapNetwork>().mypobject == null)
+                {
+                    selectcontroller.GetComponent<SwapNetwork>().mypobject = this.gameObject;
+                }
+            }
+            else if (SceneManager.GetActiveScene().name == "Stage1")
             {
                 if (this.transform.childCount > 1)
                 {
@@ -84,6 +98,10 @@ public class PlayerObjsScript : NetworkBehaviour {
                         instanced = GameObject.Find("Bird(Clone)");
                         // instanced.transform.SetParent(this.transform);
                     }
+                }
+                if (netmanager == null)
+                {
+                    netmanager = GameObject.Find("Network manager");
                 }
             }
         }
@@ -129,6 +147,16 @@ public class PlayerObjsScript : NetworkBehaviour {
             objectID = caller;
             didIClick = value;
             CmdUpdateClicked(objectID, value);
+        }
+    }
+
+    public void UpdateCharClicked(GameObject caller, bool value)
+    {
+        if (isLocalPlayer)
+        {
+            objectID = caller;
+            didIClick = value;
+            CmdUpdateCharClicked(objectID,value);
         }
     }
 
@@ -205,12 +233,12 @@ public class PlayerObjsScript : NetworkBehaviour {
 
     public void Lose()
     {        
-        CmdLose();
+        CmdLose(canvas);
     }
 
     public void Win()
     {
-        CmdLose();
+        CmdWin(canvas);
     }
 
     public void CallRope(GameObject caller)
@@ -229,6 +257,15 @@ public class PlayerObjsScript : NetworkBehaviour {
         NetworkIdentity objNetId = caller.GetComponent<NetworkIdentity>();
         objNetId.AssignClientAuthority(connectionToClient);
         caller.GetComponent<SwapNetwork>().clicked = value;
+        objNetId.RemoveClientAuthority(connectionToClient);
+    }
+
+    [Command]
+    void CmdUpdateCharClicked(GameObject caller,bool value)
+    {
+        NetworkIdentity objNetId = caller.GetComponent<NetworkIdentity>();
+        objNetId.AssignClientAuthority(connectionToClient);
+        caller.GetComponent<SwapNetwork>().mypobject.GetComponent<PlayerObjsScript>().didIClick = value;
         objNetId.RemoveClientAuthority(connectionToClient);
     }
 
@@ -424,15 +461,39 @@ public class PlayerObjsScript : NetworkBehaviour {
         NetworkServer.Spawn(instance);
     }
 
-    [Command]
-    void CmdLose()
+    [ClientRpc]
+    void RpcLose()
     {
-        canvas.GetComponent<CanvasScript>().lost = true;
+        if (netmanager == null)
+        {
+            netmanager = GameObject.Find("Network manager");
+        }
+        if (isServer)
+            netmanager.GetComponent<NMOverwriter>().ChangeScene("LoseScreen");
     }
 
     [Command]
-    void CmdWin()
+    void CmdLose(GameObject caller)
     {
-        canvas.GetComponent<CanvasScript>().won = true;
+        caller.GetComponent<CanvasScript>().lost = true;
+        RpcLose();
+    }
+
+    [ClientRpc]
+    void RpcWin()
+    {
+        if (netmanager == null)
+        {
+            netmanager = GameObject.Find("Network manager");
+        }
+        if(isServer)
+            netmanager.GetComponent<NMOverwriter>().ChangeScene("WinScreen");
+    }
+
+    [Command]
+    void CmdWin(GameObject caller)
+    {
+        caller.GetComponent<CanvasScript>().won = true;
+        RpcWin();
     }
 }

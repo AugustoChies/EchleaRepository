@@ -64,7 +64,21 @@ public class MenuPlayScript : MonoBehaviour {
             netmanager.GetComponent<NMOverwriter>().ChangeScene("Stage1");
     }
 
-    void Swap_Images(bool yes)
+    public void Accept_Button()
+    {
+        swapcontrol.GetComponent<SwapNetwork>().UpdateClicked(false);
+        swapcontrol.GetComponent<SwapNetwork>().UpdateCharClicked(false);
+        Swap_Images(true);
+    }
+
+    public void Deny_Button()
+    {
+        swapcontrol.GetComponent<SwapNetwork>().UpdateClicked(false);
+        swapcontrol.GetComponent<SwapNetwork>().UpdateCharClicked(false);
+        Swap_Images(false);
+    }
+
+    public void Swap_Images(bool yes)
     {
         if (yes)
         {

@@ -25,7 +25,7 @@ public class Birdmove : NetworkBehaviour {
 
     bool direction; //0 left, 1 right
     float scantimer, attacktimer;
-
+    GameObject spawn;
    
     // Use this for initialization
     void Start () {
@@ -107,6 +107,11 @@ public class Birdmove : NetworkBehaviour {
         else
         {
             load.GetComponent<SpriteRenderer>().enabled = false;
+        }
+        if(spawn == null)
+        {
+            spawn = GameObject.Find("SpawnBird");
+            this.transform.position = spawn.transform.position;
         }
         if (!amilocalplayer)
         {

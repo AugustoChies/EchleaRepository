@@ -15,4 +15,9 @@ public class SwapNetwork : NetworkBehaviour {
     {
         mypobject.GetComponent<PlayerObjsScript>().UpdateClicked(this.gameObject, value);
     }
+
+    public void UpdateCharClicked(bool value)
+    {
+        mypobject.GetComponent<PlayerObjsScript>().UpdateCharClicked(this.gameObject, value);
+    }
 }
