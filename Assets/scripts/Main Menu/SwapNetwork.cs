@@ -7,7 +7,7 @@ public class SwapNetwork : NetworkBehaviour {
 
     [SyncVar]
     public bool clicked;
-
+    public GameObject unclicker;
     public GameObject mypobject;
 
 
@@ -18,6 +18,6 @@ public class SwapNetwork : NetworkBehaviour {
 
     public void UpdateCharClicked(bool value)
     {
-        mypobject.GetComponent<PlayerObjsScript>().UpdateCharClicked(this.gameObject, value);
+        mypobject.GetComponent<PlayerObjsScript>().UpdateCharClicked(this.gameObject);
     }
 }

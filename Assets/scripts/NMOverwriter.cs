@@ -65,4 +65,15 @@ public class NMOverwriter : NetworkManager
     {
         ServerChangeScene(name);
     }
+
+    public void CustomStartHost()
+    {
+        StartHost();
+    }
+
+    public void CustomStartClient(string hostip)
+    {
+        networkAddress = hostip;
+        StartClient();
+    }
 }

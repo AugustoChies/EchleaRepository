@@ -6,13 +6,21 @@ using UnityEngine.SceneManagement;
 public class MenuPlayScript : MonoBehaviour {
     public GameObject bird1, bird2, exp1, exp2;
     public GameObject confirmscreen, waitscreen;
+    public GameObject clientwait;
     public GameObject accept, deny;
 
     public GameObject netmanager,swapcontrol;
+
+    public GameObject cerror, herror;
+
+    string typedip;
+    float errortimer;
+
     // Use this for initialization
     void Start()
     {
-
+        typedip = "localhost";
+        errortimer = 0;
     }
 
     // Update is called once per frame
@@ -26,6 +34,16 @@ public class MenuPlayScript : MonoBehaviour {
         {
             swapcontrol = GameObject.Find("ChangeController");
         }
+
+        if(errortimer > 0)
+        {
+            errortimer -= 1 * Time.deltaTime;
+            if(errortimer <= 0)
+            {
+                cerror.SetActive(false);
+                herror.SetActive(false);
+            }
+        }
     }
 
     public void Back_Button()
@@ -38,6 +56,17 @@ public class MenuPlayScript : MonoBehaviour {
     public void Custom_Back_Button()
     {
         netmanager.GetComponent<NMOverwriter>().DisconnectCall();            
+    }
+
+    public void Custom_Host_Button()
+    {
+        netmanager.GetComponent<NMOverwriter>().CustomStartHost();
+    }
+
+    public void Custom_Client_Button()
+    {
+        clientwait.SetActive(true);
+        netmanager.GetComponent<NMOverwriter>().CustomStartClient(typedip);
     }
 
     public void Swap_Button()
@@ -58,10 +87,33 @@ public class MenuPlayScript : MonoBehaviour {
         deny.SetActive(true);
     }
 
+    public void HideAll()
+    {
+        waitscreen.SetActive(false);
+        confirmscreen.SetActive(false);
+        accept.SetActive(false);
+        deny.SetActive(false);
+    }
+
     public void Play_Button()
     {
-        if(swapcontrol.GetComponent<SwapNetwork>().mypobject.GetComponent<PlayerObjsScript>().AmIServer())
-            netmanager.GetComponent<NMOverwriter>().ChangeScene("Stage1");
+        if (swapcontrol.GetComponent<SwapNetwork>().mypobject.GetComponent<PlayerObjsScript>().AmIServer())
+        {
+            if (netmanager.GetComponent<NMOverwriter>().numPlayers == 2)
+            {
+                netmanager.GetComponent<NMOverwriter>().ChangeScene("Stage1");
+            }
+            else
+            {
+                errortimer = 4;
+                herror.SetActive(true);
+            }
+        }
+        else
+        {
+            errortimer = 4;
+            cerror.SetActive(true);
+        }
     }
 
     public void Accept_Button()
@@ -94,6 +146,12 @@ public class MenuPlayScript : MonoBehaviour {
             accept.SetActive(false);
             deny.SetActive(false);
         
+    }
+
+    public void ApplyNewIP(string newv)
+    {
+        Debug.Log(newv);
+        typedip = newv;
     }
 
 }

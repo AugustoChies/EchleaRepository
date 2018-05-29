@@ -162,11 +162,11 @@ public class Expmove : NetworkBehaviour
                 attack.GetComponent<SpriteRenderer>().enabled = true;
                 if (direction)
                 {
-                    attack.GetComponent<BoxCollider2D>().offset = new Vector2(0.6f, 0);
+                    attack.transform.localPosition = new Vector3(1.63f, -0.3f, 0);
                 }
                 else
                 {
-                    attack.GetComponent<BoxCollider2D>().offset = new Vector2(-0.6f, 0);
+                    attack.transform.localPosition = new Vector3(-1.63f, -0.3f, 0);
                 }
                 attacktimer = 0;
             }

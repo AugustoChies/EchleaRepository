@@ -50,14 +50,22 @@ public class PlayerObjsScript : NetworkBehaviour {
                     selectcontroller.GetComponent<SwapNetwork>().mypobject = this.gameObject;
                 }
 
-                if(selectcontroller.GetComponent<SwapNetwork>().clicked && didIClick)
+                if (selectcontroller.GetComponent<SwapNetwork>().clicked)
                 {
-                    selectcanvas.GetComponent<MenuPlayScript>().ShowWait();
+                    if (didIClick)
+                    {
+                        selectcanvas.GetComponent<MenuPlayScript>().ShowWait();
+                    }
+                    else
+                    {
+                        selectcanvas.GetComponent<MenuPlayScript>().ShowReq();
+                    }
                 }
-                else if(selectcontroller.GetComponent<SwapNetwork>().clicked && !didIClick)
+                else
                 {
-                    selectcanvas.GetComponent<MenuPlayScript>().ShowReq();
+                    selectcanvas.GetComponent<MenuPlayScript>().HideAll();
                 }
+
             }
             else if(SceneManager.GetActiveScene().name == "WinScreen" || SceneManager.GetActiveScene().name == "LoseScreen")
             {
@@ -150,13 +158,13 @@ public class PlayerObjsScript : NetworkBehaviour {
         }
     }
 
-    public void UpdateCharClicked(GameObject caller, bool value)
+    public void UpdateCharClicked(GameObject caller)
     {
         if (isLocalPlayer)
         {
             objectID = caller;
-            didIClick = value;
-            CmdUpdateCharClicked(objectID,value);
+            didIClick = false;
+            CmdUpdateCharClicked(objectID);
         }
     }
 
@@ -261,12 +269,10 @@ public class PlayerObjsScript : NetworkBehaviour {
     }
 
     [Command]
-    void CmdUpdateCharClicked(GameObject caller,bool value)
+    void CmdUpdateCharClicked(GameObject caller)
     {
-        NetworkIdentity objNetId = caller.GetComponent<NetworkIdentity>();
-        objNetId.AssignClientAuthority(connectionToClient);
-        caller.GetComponent<SwapNetwork>().mypobject.GetComponent<PlayerObjsScript>().didIClick = value;
-        objNetId.RemoveClientAuthority(connectionToClient);
+        GameObject instance = Instantiate(caller.GetComponent<SwapNetwork>().unclicker, new Vector3(0,0,0), Quaternion.identity);
+        NetworkServer.Spawn(instance);
     }
 
 
