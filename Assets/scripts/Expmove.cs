@@ -27,6 +27,8 @@ public class Expmove : NetworkBehaviour
     float scantimer, attacktimer;
     GameObject spawn;
     public float vspeed;
+
+    Animator anim;
     // Use this for initialization
     void Start()
     {       
@@ -34,6 +36,7 @@ public class Expmove : NetworkBehaviour
         canmove = true;
         attacktimer = scantimer = -1;
         distresstimer = 0;
+        anim = this.gameObject.GetComponent<Animator>();
     }
 
     // Update is called once per frame
@@ -263,6 +266,15 @@ public class Expmove : NetworkBehaviour
         }
 
         vspeed = this.gameObject.GetComponent<Rigidbody2D>().velocity.y;
+
+        if (!canjump && !onrope)
+        {
+            anim.SetBool("Midair", true);
+        }
+        else
+        {
+            anim.SetBool("Midair", false);
+        }
     }
 
     
@@ -319,6 +331,8 @@ public class Expmove : NetworkBehaviour
                     }
                 }
             }
+
+            
         }
 
     }

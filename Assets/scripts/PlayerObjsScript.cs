@@ -168,6 +168,15 @@ public class PlayerObjsScript : NetworkBehaviour {
         }
     }
 
+    public void SwapChar(GameObject caller)
+    {
+        if (isLocalPlayer)
+        {
+            objectID = caller;
+            CmdSwapChar(objectID);
+        }
+    }
+
 
     public void ShowIcon(GameObject caller)
     {
@@ -273,6 +282,21 @@ public class PlayerObjsScript : NetworkBehaviour {
     {
         GameObject instance = Instantiate(caller.GetComponent<SwapNetwork>().unclicker, new Vector3(0,0,0), Quaternion.identity);
         NetworkServer.Spawn(instance);
+    }
+
+    [ClientRpc]
+    void RpcSwapChar(GameObject caller)
+    {
+        caller.GetComponent<SwapNetwork>().switchchar = true;
+    }
+
+    [Command]
+    void CmdSwapChar(GameObject caller)
+    {
+        NetworkIdentity objNetId = caller.GetComponent<NetworkIdentity>();
+        objNetId.AssignClientAuthority(connectionToClient);
+        RpcSwapChar(caller);
+        objNetId.RemoveClientAuthority(connectionToClient);
     }
 
 

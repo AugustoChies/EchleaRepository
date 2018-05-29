@@ -13,6 +13,8 @@ public class MenuPlayScript : MonoBehaviour {
 
     public GameObject cerror, herror;
 
+    public bool char1, char2; // true explorador, false passaro
+
     string typedip;
     float errortimer;
 
@@ -21,6 +23,8 @@ public class MenuPlayScript : MonoBehaviour {
     {
         typedip = "localhost";
         errortimer = 0;
+        char1 = true;
+        char2 = false;        
     }
 
     // Update is called once per frame
@@ -43,6 +47,12 @@ public class MenuPlayScript : MonoBehaviour {
                 cerror.SetActive(false);
                 herror.SetActive(false);
             }
+        }
+
+        if (swapcontrol.GetComponent<SwapNetwork>().switchchar)
+        {
+            Swap_Images(true);
+            swapcontrol.GetComponent<SwapNetwork>().switchchar = false;
         }
     }
 
@@ -101,6 +111,7 @@ public class MenuPlayScript : MonoBehaviour {
         {
             if (netmanager.GetComponent<NMOverwriter>().numPlayers == 2)
             {
+                netmanager.GetComponent<NMOverwriter>().SwapChars(char1, char2);
                 netmanager.GetComponent<NMOverwriter>().ChangeScene("Stage1");
             }
             else
@@ -120,21 +131,21 @@ public class MenuPlayScript : MonoBehaviour {
     {
         swapcontrol.GetComponent<SwapNetwork>().UpdateClicked(false);
         swapcontrol.GetComponent<SwapNetwork>().UpdateCharClicked(false);
-        Swap_Images(true);
+        swapcontrol.GetComponent<SwapNetwork>().Swap();
     }
 
     public void Deny_Button()
     {
         swapcontrol.GetComponent<SwapNetwork>().UpdateClicked(false);
         swapcontrol.GetComponent<SwapNetwork>().UpdateCharClicked(false);
-        Swap_Images(false);
     }
 
     public void Swap_Images(bool yes)
     {
         if (yes)
         {
-            netmanager.GetComponent<NMOverwriter>().SwapChars();
+            char1 = !char1;
+            char2 = !char2;
             bird1.SetActive(!bird1.activeSelf);
             bird2.SetActive(!bird2.activeSelf);
             exp1.SetActive(!exp1.activeSelf);
