@@ -40,24 +40,24 @@ public class NMOverwriter : NetworkManager
         MasterServer.UnregisterHost();
     }
 
-    public void SwapChars()
+    public void SwapChars(bool nchar1,bool nchar2)
     {
-        if(char1.GetComponent<Expmove>())
-        {
-            char1 = bird;
-        }
-        else
+        if(nchar1)
         {
             char1 = explorer;
         }
-
-        if (char2.GetComponent<Expmove>())
+        else
         {
-            char2 = bird;
+            char1 = bird;
+        }
+
+        if (nchar2)
+        {
+            char2 = explorer;
         }
         else
         {
-            char2 = explorer;
+            char2 = bird;
         }
     }
 
