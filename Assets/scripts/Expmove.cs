@@ -23,7 +23,9 @@ public class Expmove : NetworkBehaviour
 
     public bool onfriendrevival;
 
+    [SyncVar]
     bool direction; //0 left, 1 right
+    bool oldirection;
     float scantimer, attacktimer;
     GameObject spawn;
     public float vspeed;
@@ -38,13 +40,13 @@ public class Expmove : NetworkBehaviour
 
     // Update is called once per frame
     void FixedUpdate()
-    {
+    {       
         if (!amilocalplayer)
         {
             return;
         }
 
-        
+        oldirection = direction;
 
         if (canmove)
         {
@@ -101,8 +103,11 @@ public class Expmove : NetworkBehaviour
         {
             this.gameObject.GetComponent<Rigidbody2D>().velocity = new Vector2(0, this.gameObject.GetComponent<Rigidbody2D>().velocity.y);
         }
-        
-            
+        if (oldirection != direction)
+        {
+            CmdChangeDir(direction);
+        }
+
     }
 
     void Update()
@@ -130,6 +135,14 @@ public class Expmove : NetworkBehaviour
         {
             spawn = GameObject.Find("SpawnExplorer");
             this.transform.position = spawn.transform.position;
+        }
+        if(direction)
+        {
+            this.gameObject.GetComponent<SpriteRenderer>().flipX = false;
+        }
+        else
+        {
+            this.gameObject.GetComponent<SpriteRenderer>().flipX = true;
         }
         if (!amilocalplayer)
         {
@@ -378,8 +391,13 @@ public class Expmove : NetworkBehaviour
     [Command]
     public void CmdLifeStatus(bool isitdead)
     {
-
         RpcLifeStatus(isitdead);
+    }
+
+    [Command]
+    public void CmdChangeDir(bool dir)
+    {
+        direction = dir;
     }
 
     [Command]
