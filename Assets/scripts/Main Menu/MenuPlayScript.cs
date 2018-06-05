@@ -49,10 +49,13 @@ public class MenuPlayScript : MonoBehaviour {
             }
         }
 
-        if (swapcontrol.GetComponent<SwapNetwork>().switchchar)
+        if (swapcontrol)
         {
-            Swap_Images(true);
-            swapcontrol.GetComponent<SwapNetwork>().switchchar = false;
+            if (swapcontrol.GetComponent<SwapNetwork>().switchchar)
+            {
+                Swap_Images(true);
+                swapcontrol.GetComponent<SwapNetwork>().switchchar = false;
+            }
         }
     }
 

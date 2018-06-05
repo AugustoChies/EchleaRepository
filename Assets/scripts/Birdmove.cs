@@ -23,7 +23,9 @@ public class Birdmove : NetworkBehaviour {
 
     public bool onfriendrevival;
 
+    [SyncVar]
     bool direction; //0 left, 1 right
+    bool oldirection;
     float scantimer, attacktimer;
     GameObject spawn;
    
@@ -44,7 +46,7 @@ public class Birdmove : NetworkBehaviour {
         {
             return;
         }
-        
+        oldirection = direction;
         vertical = horizontal = 0;
         
         if (canmove)
@@ -72,7 +74,10 @@ public class Birdmove : NetworkBehaviour {
                                     (gameObject.GetComponent<Rigidbody2D>().position + new Vector2(horizontal * speed * Time.deltaTime, vertical * speed * Time.deltaTime));
             
         }
-
+        if (oldirection != direction)
+        {
+            CmdChangeDir(direction);
+        }
     }
 
     void Update()
@@ -315,6 +320,12 @@ public class Birdmove : NetworkBehaviour {
     {
         carrying = carr;
         relicindex = ri;
+    }
+
+    [Command]
+    public void CmdChangeDir(bool dir)
+    {
+        direction = dir;
     }
 
     [ClientRpc]

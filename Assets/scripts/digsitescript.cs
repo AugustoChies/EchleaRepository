@@ -122,8 +122,12 @@ public class digsitescript : NetworkBehaviour
         {
             inventory.GetComponent<Inventoryscr>().sendInfo(0);
         }
+        else if(type == 3)
+        {
+            inventory.GetComponent<Inventoryscr>().sendInfo(relindex);
+        }
 
-        if(explorer != null)
+        if (explorer != null)
             explorer.GetComponent<Expmove>().Dig(this.gameObject);
         if (bird != null)
             bird.GetComponent<Birdmove>().Dig(this.gameObject);

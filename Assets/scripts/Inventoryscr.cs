@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 
 public class Inventoryscr : NetworkBehaviour {
     [SyncVar]
@@ -29,6 +30,16 @@ public class Inventoryscr : NetworkBehaviour {
     public GameObject explorer;
     public GameObject canvas;
 
+    public void Awake()
+    {
+        DontDestroyOnLoad(this);
+
+        if (FindObjectsOfType(GetType()).Length > 1)
+        {
+            Destroy(this.gameObject);
+        }
+    }
+
     // Use this for initialization
     void Start () {
 		
@@ -38,7 +49,12 @@ public class Inventoryscr : NetworkBehaviour {
 	void Update () {
         if (explorer == null)
         {
+            if (!(SceneManager.GetActiveScene().name == "Stage1" || SceneManager.GetActiveScene().name == "Stage2" || SceneManager.GetActiveScene().name == "Stage3"))
+            {
+                Destroy(this.gameObject);
+            }
             explorer = GameObject.Find("Explorer(Clone)");
+            keys = 0;
         }
 
         if (bird == null)
@@ -46,6 +62,16 @@ public class Inventoryscr : NetworkBehaviour {
             bird = GameObject.Find("Bird(Clone)");
         }
         canvas.GetComponent<CanvasScript>().keys = keys;
+        canvas.GetComponent<CanvasScript>().relic1 = relic1;
+        canvas.GetComponent<CanvasScript>().relic2 = relic2;
+        canvas.GetComponent<CanvasScript>().relic3 = relic3;
+        canvas.GetComponent<CanvasScript>().relic4 = relic4;
+        canvas.GetComponent<CanvasScript>().relic5 = relic5;
+        canvas.GetComponent<CanvasScript>().relic6 = relic6;
+        canvas.GetComponent<CanvasScript>().relic7 = relic7;
+        canvas.GetComponent<CanvasScript>().relic8 = relic8;
+        canvas.GetComponent<CanvasScript>().relic9 = relic9;
+
     }
 
     public void sendInfo(int what)

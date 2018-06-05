@@ -31,7 +31,7 @@ public class PlayerObjsScript : NetworkBehaviour {
             if (isLocalPlayer)
             {
                 started = true;
-                if (SceneManager.GetActiveScene().name == "Stage1")
+                if (SceneManager.GetActiveScene().name == "Stage1" || SceneManager.GetActiveScene().name == "Stage2" || SceneManager.GetActiveScene().name == "Stage3")
                 {                    
                     CmdSpawnPlayer();
                 }
@@ -76,7 +76,7 @@ public class PlayerObjsScript : NetworkBehaviour {
                     selectcontroller.GetComponent<SwapNetwork>().mypobject = this.gameObject;
                 }
             }
-            else if (SceneManager.GetActiveScene().name == "Stage1")
+            else if (SceneManager.GetActiveScene().name == "Stage1" || SceneManager.GetActiveScene().name == "Stage2" || SceneManager.GetActiveScene().name == "Stage3")
             {
                 if (this.transform.childCount > 1)
                 {
@@ -347,7 +347,33 @@ public class PlayerObjsScript : NetworkBehaviour {
             case 0:
                 caller.GetComponent<Inventoryscr>().keys += 1;
                 break;
-
+            case 1:
+                caller.GetComponent<Inventoryscr>().relic1 = true;
+                break;
+            case 2:
+                caller.GetComponent<Inventoryscr>().relic2 = true;
+                break;
+            case 3:
+                caller.GetComponent<Inventoryscr>().relic3 = true;
+                break;
+            case 4:
+                caller.GetComponent<Inventoryscr>().relic4 = true;
+                break;
+            case 5:
+                caller.GetComponent<Inventoryscr>().relic5 = true;
+                break;
+            case 6:
+                caller.GetComponent<Inventoryscr>().relic6 = true;
+                break;
+            case 7:
+                caller.GetComponent<Inventoryscr>().relic7 = true;
+                break;
+            case 8:
+                caller.GetComponent<Inventoryscr>().relic8 = true;
+                break;
+            case 9:
+                caller.GetComponent<Inventoryscr>().relic9 = true;
+                break;
             default:
                 break;
         }
@@ -505,7 +531,6 @@ public class PlayerObjsScript : NetworkBehaviour {
     [Command]
     void CmdLose(GameObject caller)
     {
-        caller.GetComponent<CanvasScript>().lost = true;
         RpcLose();
     }
 
@@ -523,7 +548,6 @@ public class PlayerObjsScript : NetworkBehaviour {
     [Command]
     void CmdWin(GameObject caller)
     {
-        caller.GetComponent<CanvasScript>().won = true;
         RpcWin();
     }
 }
