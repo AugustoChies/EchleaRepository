@@ -28,7 +28,8 @@ public class Birdmove : NetworkBehaviour {
     bool oldirection;
     float scantimer, attacktimer;
     GameObject spawn;
-   
+
+    Animator anim;
     // Use this for initialization
     void Start () {
                
@@ -37,6 +38,8 @@ public class Birdmove : NetworkBehaviour {
         attacktimer = scantimer = -1;
         relicindex = 0;
         distresstimer = 0;
+
+        anim = this.gameObject.GetComponent<Animator>();
     }
 
     // Update is called once per frame
@@ -55,19 +58,28 @@ public class Birdmove : NetworkBehaviour {
             {
                 horizontal = -1;
                 direction = false;
+                anim.SetBool("Moving", true);
             }
             else if (Input.GetKey("d"))
             {
                 horizontal = 1;
                 direction = true;
+                anim.SetBool("Moving", true);
             }
             if (Input.GetKey("w"))
             {
                 vertical = 1;
+                anim.SetBool("Moving", true);
             }
             else if(Input.GetKey("s"))
             {
                 vertical = -1;
+                anim.SetBool("Moving", true);
+            }
+
+            if(!(Input.GetKey("a") && Input.GetKey("d") && Input.GetKey("w") && Input.GetKey("s")))
+            {
+                anim.SetBool("Moving", false);
             }
 
             this.gameObject.GetComponent<Rigidbody2D>().MovePosition
@@ -118,6 +130,14 @@ public class Birdmove : NetworkBehaviour {
             spawn = GameObject.Find("SpawnBird");
             this.transform.position = spawn.transform.position;
         }
+        if (direction)
+        {
+            this.gameObject.GetComponent<SpriteRenderer>().flipX = false;
+        }
+        else
+        {
+            this.gameObject.GetComponent<SpriteRenderer>().flipX = true;
+        }
         if (!amilocalplayer)
         {
             return;
@@ -130,12 +150,14 @@ public class Birdmove : NetworkBehaviour {
             {
                 this.gameObject.GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
                 canmove = false;
+                anim.SetBool("Moving", false);
                 myparent.GetComponent<PlayerObjsScript>().CallRope(this.gameObject);
             }
             if (Input.GetKeyDown("j"))
             {
                 attack.GetComponent<BoxCollider2D>().enabled = true;
                 attack.GetComponent<SpriteRenderer>().enabled = true;
+                anim.SetTrigger("Attack");
                 if (direction)
                 {
                     attack.GetComponent<BoxCollider2D>().offset = new Vector2(0.6f, 0);
@@ -152,6 +174,7 @@ public class Birdmove : NetworkBehaviour {
                 scan.GetComponent<CapsuleCollider2D>().enabled = true;
                 scan.GetComponent<CapsuleCollider2D>().offset = new Vector2(0.005f, 0);
                 scan.GetComponent<SpriteRenderer>().enabled = true;
+                anim.SetTrigger("Scan");
             }
         }
         else
@@ -233,12 +256,14 @@ public class Birdmove : NetworkBehaviour {
                 restimer = 0;
                 CmdLifeStatus(false);
                 CmdDistress(false);
+                anim.SetBool("Dead",false);
             }
             if (explorer != null && explorer.GetComponent<Expmove>().reviving)
             {
                 restimer = 0;
                 CmdLifeStatus(false);
                 CmdDistress(false);
+                anim.SetBool("Dead", false);
             }
         }
 
@@ -268,6 +293,7 @@ public class Birdmove : NetworkBehaviour {
             {
                 CmdLifeStatus(true);
                 CmdDistress(true);
+                anim.SetBool("Dead", true);
             }
             if (other.gameObject.tag == "delivery")
             {
@@ -295,7 +321,8 @@ public class Birdmove : NetworkBehaviour {
             {
                  CmdLifeStatus(true);
                  CmdDistress(true);
-                 this.gameObject.GetComponent<Rigidbody2D>().AddForce(new Vector2(-100, 0));
+                anim.SetBool("Dead", true);
+                this.gameObject.GetComponent<Rigidbody2D>().AddForce(new Vector2(-100, 0));
             }
             if (coll.gameObject.tag == "chao")
             {
@@ -336,6 +363,7 @@ public class Birdmove : NetworkBehaviour {
             revival.GetComponent<BoxCollider2D>().enabled = true;
             dead = isitdead;
             canmove = false;
+            anim.SetBool("Moving", false);
             this.gameObject.GetComponent<Rigidbody2D>().gravityScale = 1;
             myparent.GetComponent<PlayerObjsScript>().DestroyRope();
         }

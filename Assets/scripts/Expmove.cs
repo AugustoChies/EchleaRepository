@@ -57,10 +57,10 @@ public class Expmove : NetworkBehaviour
             {
                 vertical = horizontal = 0;
                 if (Input.GetKey("a"))
-                {
-
+                {                    
                     this.gameObject.GetComponent<Rigidbody2D>().gravityScale = 1;
                     onrope = false;
+                    anim.SetBool("Onrope", false);
                     this.gameObject.GetComponent<Rigidbody2D>().velocity += new Vector2(-jumpvalue, jumpvalue * 0.7f);
                 }
                 else if (Input.GetKey("d"))
@@ -68,16 +68,25 @@ public class Expmove : NetworkBehaviour
 
                     this.gameObject.GetComponent<Rigidbody2D>().gravityScale = 1;
                     onrope = false;
+                    anim.SetBool("Onrope", false);
                     this.gameObject.GetComponent<Rigidbody2D>().velocity += new Vector2(jumpvalue, jumpvalue * 0.7f);
                 }
                 if (Input.GetKey("w"))
                 {
                     if (!limited)
+                    {
                         vertical = 1;
+                        anim.SetBool("Moving", true);
+                    }
                 }
                 else if (Input.GetKey("s"))
                 {
                     vertical = -1;
+                    anim.SetBool("Moving", true);
+                }
+                else
+                {
+                    anim.SetBool("Moving", false);
                 }
 
                 this.gameObject.GetComponent<Rigidbody2D>().MovePosition
@@ -89,16 +98,19 @@ public class Expmove : NetworkBehaviour
                 {
                     this.gameObject.GetComponent<Rigidbody2D>().velocity = new Vector2(-1 * speed, this.gameObject.GetComponent<Rigidbody2D>().velocity.y);
                     direction = false;
+                    anim.SetBool("Moving", true);
                 }
                 else if (Input.GetKey("d"))
                 {
                     this.gameObject.GetComponent<Rigidbody2D>().velocity = new Vector2(1 * speed, this.gameObject.GetComponent<Rigidbody2D>().velocity.y);
                     direction = true;
+                    anim.SetBool("Moving", true);
                 }
             }
             else
             {
                 this.gameObject.GetComponent<Rigidbody2D>().velocity = new Vector2(0, this.gameObject.GetComponent<Rigidbody2D>().velocity.y);
+                anim.SetBool("Moving", false);
             }
 
         }
@@ -162,6 +174,7 @@ public class Expmove : NetworkBehaviour
                 {
                     this.gameObject.GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
                     onrope = true;
+                    anim.SetBool("Onrope", true);
                     this.gameObject.GetComponent<Rigidbody2D>().gravityScale = 0;
                     this.gameObject.transform.position = new Vector3(xrope, this.gameObject.transform.position.y, 0);
                 }
@@ -176,6 +189,7 @@ public class Expmove : NetworkBehaviour
             {
                 attack.GetComponent<BoxCollider2D>().enabled = true;
                 attack.GetComponent<SpriteRenderer>().enabled = true;
+                anim.SetTrigger("Attack");
                 if (direction)
                 {
                     attack.transform.localPosition = new Vector3(1.63f, -0.3f, 0);
@@ -189,7 +203,9 @@ public class Expmove : NetworkBehaviour
             if (Input.GetKeyDown("k") && canjump)
             {
                 scantimer = 0;
+                anim.SetTrigger("Scan");
                 canmove = false;
+                anim.SetBool("Moving", false);
             }         
         }
 
@@ -273,6 +289,7 @@ public class Expmove : NetworkBehaviour
         {
             if(bird != null && bird.GetComponent<Birdmove>().reviving)
             {
+                anim.SetBool("Dead",false);
                 CmdLifeStatus(false);
                 CmdDistress(false);
             }
@@ -303,6 +320,7 @@ public class Expmove : NetworkBehaviour
                     touchingrope = false;
                     this.gameObject.GetComponent<Rigidbody2D>().gravityScale = 1;
                     onrope = false;
+                    anim.SetBool("Onrope", false);
                 }
                 else
                 {
@@ -331,6 +349,7 @@ public class Expmove : NetworkBehaviour
             }
             if (other.gameObject.tag == "enemy")
             {
+                anim.SetBool("Dead", true);
                 CmdLifeStatus(true);
                 CmdDistress(true);
             }
@@ -371,12 +390,14 @@ public class Expmove : NetworkBehaviour
        
             if (coll.gameObject.tag == "enemyattack")
             {
+                anim.SetBool("Dead", true);
                 CmdLifeStatus(true);
                 CmdDistress(true);
             }
 
             if (coll.gameObject.tag == "chao" && vspeed <= -12)
             {
+                anim.SetBool("Dead", true);
                 CmdLifeStatus(true);
                 CmdDistress(true);
             }
@@ -391,7 +412,9 @@ public class Expmove : NetworkBehaviour
             revival.GetComponent<BoxCollider2D>().enabled = true;
             dead = isitdead;
             canmove = false;
+            anim.SetBool("Moving", false);
             onrope = false;
+            anim.SetBool("Onrope", false);
             this.gameObject.GetComponent<Rigidbody2D>().gravityScale = 1;
         }
         else
