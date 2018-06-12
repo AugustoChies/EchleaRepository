@@ -77,11 +77,6 @@ public class Birdmove : NetworkBehaviour {
                 anim.SetBool("Moving", true);
             }
 
-            if(!(Input.GetKey("a") && Input.GetKey("d") && Input.GetKey("w") && Input.GetKey("s")))
-            {
-                anim.SetBool("Moving", false);
-            }
-
             this.gameObject.GetComponent<Rigidbody2D>().MovePosition
                                     (gameObject.GetComponent<Rigidbody2D>().position + new Vector2(horizontal * speed * Time.deltaTime, vertical * speed * Time.deltaTime));
             
@@ -156,15 +151,16 @@ public class Birdmove : NetworkBehaviour {
             if (Input.GetKeyDown("j"))
             {
                 attack.GetComponent<BoxCollider2D>().enabled = true;
-                attack.GetComponent<SpriteRenderer>().enabled = true;
-                anim.SetTrigger("Attack");
+
+
+                CmdAttAnim();
                 if (direction)
                 {
-                    attack.GetComponent<BoxCollider2D>().offset = new Vector2(0.6f, 0);
+                    attack.transform.localPosition = new Vector3(0.75f, -0.35f, 0);
                 }
                 else
                 {
-                    attack.GetComponent<BoxCollider2D>().offset = new Vector2(-0.6f, 0);
+                    attack.transform.localPosition = new Vector3(-0.75f, -0.35f, 0);
                 }
                 attacktimer = 0;
             }
@@ -353,6 +349,19 @@ public class Birdmove : NetworkBehaviour {
     public void CmdChangeDir(bool dir)
     {
         direction = dir;
+    }
+
+
+    [ClientRpc]
+    void RpcAttAnim()
+    {
+        anim.SetTrigger("Attack");
+    }
+
+    [Command]
+    void CmdAttAnim()
+    {
+        RpcAttAnim();
     }
 
     [ClientRpc]
