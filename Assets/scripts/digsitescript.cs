@@ -135,7 +135,7 @@ public class digsitescript : NetworkBehaviour
 
     void BirdDug()
     {
-        Debug.Log("here");
+        
         if (type == 1)
         {
             inventory.GetComponent<Inventoryscr>().sendInfo(-2);

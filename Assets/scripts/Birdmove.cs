@@ -57,24 +57,20 @@ public class Birdmove : NetworkBehaviour {
             if (Input.GetKey("a"))
             {
                 horizontal = -1;
-                direction = false;
-                anim.SetBool("Moving", true);
+                direction = false;                
             }
             else if (Input.GetKey("d"))
             {
                 horizontal = 1;
-                direction = true;
-                anim.SetBool("Moving", true);
+                direction = true;            
             }
             if (Input.GetKey("w"))
             {
-                vertical = 1;
-                anim.SetBool("Moving", true);
+                vertical = 1;               
             }
             else if(Input.GetKey("s"))
             {
-                vertical = -1;
-                anim.SetBool("Moving", true);
+                vertical = -1;                
             }
 
             this.gameObject.GetComponent<Rigidbody2D>().MovePosition
@@ -145,15 +141,15 @@ public class Birdmove : NetworkBehaviour {
             {
                 this.gameObject.GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
                 canmove = false;
-                anim.SetBool("Moving", false);
+                anim.SetBool("Deployed", true);
+                CmdAttAnim(5);
                 myparent.GetComponent<PlayerObjsScript>().CallRope(this.gameObject);
             }
             if (Input.GetKeyDown("j"))
             {
                 attack.GetComponent<BoxCollider2D>().enabled = true;
 
-
-                CmdAttAnim();
+                CmdAttAnim(1);
                 if (direction)
                 {
                     attack.transform.localPosition = new Vector3(0.75f, -0.35f, 0);
@@ -169,8 +165,7 @@ public class Birdmove : NetworkBehaviour {
                 scantimer = 0;
                 scan.GetComponent<CapsuleCollider2D>().enabled = true;
                 scan.GetComponent<CapsuleCollider2D>().offset = new Vector2(0.005f, 0);
-                scan.GetComponent<SpriteRenderer>().enabled = true;
-                anim.SetTrigger("Scan");
+                CmdAttAnim(2);
             }
         }
         else
@@ -181,6 +176,7 @@ public class Birdmove : NetworkBehaviour {
                 {
                     myparent.GetComponent<PlayerObjsScript>().DestroyRope();
                     canmove = true;
+                    anim.SetBool("Deployed", false);
                 }
             }
         }
@@ -253,6 +249,8 @@ public class Birdmove : NetworkBehaviour {
                 CmdLifeStatus(false);
                 CmdDistress(false);
                 anim.SetBool("Dead",false);
+                CmdAttAnim(4);
+                
             }
             if (explorer != null && explorer.GetComponent<Expmove>().reviving)
             {
@@ -260,6 +258,7 @@ public class Birdmove : NetworkBehaviour {
                 CmdLifeStatus(false);
                 CmdDistress(false);
                 anim.SetBool("Dead", false);
+                CmdAttAnim(4);
             }
         }
 
@@ -290,6 +289,7 @@ public class Birdmove : NetworkBehaviour {
                 CmdLifeStatus(true);
                 CmdDistress(true);
                 anim.SetBool("Dead", true);
+                CmdAttAnim(3);
             }
             if (other.gameObject.tag == "delivery")
             {
@@ -318,6 +318,8 @@ public class Birdmove : NetworkBehaviour {
                  CmdLifeStatus(true);
                  CmdDistress(true);
                 anim.SetBool("Dead", true);
+                CmdAttAnim(3);
+
                 this.gameObject.GetComponent<Rigidbody2D>().AddForce(new Vector2(-100, 0));
             }
             if (coll.gameObject.tag == "chao")
@@ -353,15 +355,34 @@ public class Birdmove : NetworkBehaviour {
 
 
     [ClientRpc]
-    void RpcAttAnim()
+    void RpcAttAnim(int animtype)
     {
-        anim.SetTrigger("Attack");
+        switch (animtype)
+        {
+            case 1:
+                anim.SetTrigger("Attack");
+                break;
+            case 2:
+                anim.SetTrigger("Scan");
+                break;
+            case 3:
+                anim.SetTrigger("Die");
+                break;
+            case 4:
+                anim.SetTrigger("Revive");
+                break;                
+            case 5:
+                anim.SetTrigger("Deploy");
+                break;
+            default:
+                break;
+        }
     }
 
     [Command]
-    void CmdAttAnim()
+    void CmdAttAnim(int animtype)
     {
-        RpcAttAnim();
+        RpcAttAnim(animtype);
     }
 
     [ClientRpc]
@@ -372,7 +393,7 @@ public class Birdmove : NetworkBehaviour {
             revival.GetComponent<BoxCollider2D>().enabled = true;
             dead = isitdead;
             canmove = false;
-            anim.SetBool("Moving", false);
+            anim.SetBool("Deployed", false);
             this.gameObject.GetComponent<Rigidbody2D>().gravityScale = 1;
             myparent.GetComponent<PlayerObjsScript>().DestroyRope();
         }

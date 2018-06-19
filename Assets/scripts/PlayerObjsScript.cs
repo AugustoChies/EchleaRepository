@@ -201,8 +201,8 @@ public class PlayerObjsScript : NetworkBehaviour {
             CmdUpdateInventory(inventory, type);
 
         objectID = canvas;
-
-        CmdUpdateCanvas(objectID, type);
+        if(isLocalPlayer)
+             CmdUpdateCanvas(objectID, type);
         
     }
 
@@ -386,10 +386,10 @@ public class PlayerObjsScript : NetworkBehaviour {
         NetworkIdentity objNetId = caller.GetComponent<NetworkIdentity>();
 
         objNetId.AssignClientAuthority(connectionToClient);
-        canvas.GetComponent<CanvasScript>().curserate += 0.1f;
+        caller.GetComponent<CanvasScript>().curserate += 0.1f;
         if (type == -2)
         {
-            canvas.GetComponent<CanvasScript>().curserate += 0.1f;
+            caller.GetComponent<CanvasScript>().curserate += 0.1f;
         }
         objNetId.RemoveClientAuthority(connectionToClient);
          

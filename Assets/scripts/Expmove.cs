@@ -374,6 +374,9 @@ public class Expmove : NetworkBehaviour
         if (other.gameObject.tag == "corda")
         {
             touchingrope = false;
+            this.gameObject.GetComponent<Rigidbody2D>().gravityScale = 1;
+            onrope = false;
+            anim.SetBool("Onrope", false);
         }
         if (other.gameObject.tag == "limit")
         {
