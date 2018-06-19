@@ -175,8 +175,16 @@ public class Expmove : NetworkBehaviour
                     this.gameObject.GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
                     onrope = true;
                     anim.SetBool("Onrope", true);
-                    this.gameObject.GetComponent<Rigidbody2D>().gravityScale = 0;
+                    this.gameObject.GetComponent<Rigidbody2D>().gravityScale = 0;                    
                     this.gameObject.transform.position = new Vector3(xrope, this.gameObject.transform.position.y, 0);
+                    if (direction)
+                    {
+                        this.gameObject.transform.position -= new Vector3(0.3f, 0, 0);
+                    }
+                    else
+                    {
+                        this.gameObject.transform.position -= new Vector3(-0.3f, 0, 0);
+                    }
                 }
                 else if (canjump)
                 {
@@ -188,8 +196,8 @@ public class Expmove : NetworkBehaviour
             if (Input.GetKeyDown("j") && canjump)
             {
                 attack.GetComponent<BoxCollider2D>().enabled = true;
-                attack.GetComponent<SpriteRenderer>().enabled = true;
-                anim.SetTrigger("Attack");
+                
+                CmdAttAnim(1);
                 if (direction)
                 {
                     attack.transform.localPosition = new Vector3(1.63f, -0.3f, 0);
@@ -203,7 +211,7 @@ public class Expmove : NetworkBehaviour
             if (Input.GetKeyDown("k") && canjump)
             {
                 scantimer = 0;
-                anim.SetTrigger("Scan");
+                CmdAttAnim(2);
                 canmove = false;
                 anim.SetBool("Moving", false);
             }         
@@ -217,22 +225,22 @@ public class Expmove : NetworkBehaviour
         if (scantimer >= 0)
         {
             scantimer += 1 * Time.deltaTime;
-            if (scantimer >= 5)
+            if (scantimer >= 2.3)
             {
                 scan.GetComponent<BoxCollider2D>().enabled = false;
                 scan.GetComponent<BoxCollider2D>().offset = new Vector2(0, 0);
-                scan.GetComponent<SpriteRenderer>().enabled = false;
+                
                 scantimer = -1;
                 if (!dead)
                     canmove = true;
             }
-            else if (scantimer >= 3)
+            else if (scantimer >= 1.5)
             {
                 if (!dead)
                 {
                     scan.GetComponent<BoxCollider2D>().enabled = true;
                     scan.GetComponent<BoxCollider2D>().offset = new Vector2(0.005f, 0);
-                    scan.GetComponent<SpriteRenderer>().enabled = true;
+                    
                 }
             }
         }
@@ -290,6 +298,7 @@ public class Expmove : NetworkBehaviour
             if(bird != null && bird.GetComponent<Birdmove>().reviving)
             {
                 anim.SetBool("Dead",false);
+                CmdAttAnim(4);
                 CmdLifeStatus(false);
                 CmdDistress(false);
             }
@@ -350,6 +359,7 @@ public class Expmove : NetworkBehaviour
             if (other.gameObject.tag == "enemy")
             {
                 anim.SetBool("Dead", true);
+                CmdAttAnim(3);
                 CmdLifeStatus(true);
                 CmdDistress(true);
             }
@@ -394,6 +404,7 @@ public class Expmove : NetworkBehaviour
             if (coll.gameObject.tag == "enemyattack")
             {
                 anim.SetBool("Dead", true);
+                CmdAttAnim(3);
                 CmdLifeStatus(true);
                 CmdDistress(true);
             }
@@ -401,6 +412,7 @@ public class Expmove : NetworkBehaviour
             if (coll.gameObject.tag == "chao" && vspeed <= -12)
             {
                 anim.SetBool("Dead", true);
+                CmdAttAnim(3);
                 CmdLifeStatus(true);
                 CmdDistress(true);
             }
@@ -444,6 +456,34 @@ public class Expmove : NetworkBehaviour
     void CmdIAmReviving()
     {
         reviving = true;
+    }
+
+    [ClientRpc]
+    void RpcAttAnim(int animtype)
+    {
+        switch (animtype)
+        {
+            case 1:
+                anim.SetTrigger("Attack");
+                break;
+            case 2:
+                anim.SetTrigger("Scan");
+                break;
+            case 3:
+                anim.SetTrigger("Die");
+                break;
+            case 4:
+                anim.SetTrigger("Revive");
+                break;
+            default:
+                break;
+        }
+    }
+
+    [Command]
+    void CmdAttAnim(int animtype)
+    {
+        RpcAttAnim(animtype);
     }
 
     [ClientRpc]
