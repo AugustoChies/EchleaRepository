@@ -541,8 +541,21 @@ public class PlayerObjsScript : NetworkBehaviour {
         {
             netmanager = GameObject.Find("Network manager");
         }
-        if(isServer)
-            netmanager.GetComponent<NMOverwriter>().ChangeScene("WinScreen");
+        if (isServer)
+        {
+            if (SceneManager.GetActiveScene().name == "Stage1")
+            {
+                netmanager.GetComponent<NMOverwriter>().ChangeScene("Stage2");
+            }
+            else if (SceneManager.GetActiveScene().name == "Stage2")
+            {
+                netmanager.GetComponent<NMOverwriter>().ChangeScene("Stage3");
+            }
+            else if (SceneManager.GetActiveScene().name == "Stage3")
+            {
+                netmanager.GetComponent<NMOverwriter>().ChangeScene("WinScreen");
+            }
+        }
     }
 
     [Command]

@@ -142,6 +142,7 @@ public class Birdmove : NetworkBehaviour {
                 this.gameObject.GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
                 canmove = false;
                 anim.SetBool("Deployed", true);
+                maincamera.gameObject.GetComponent<Camera>().orthographicSize = 5;
                 CmdAttAnim(5);
                 myparent.GetComponent<PlayerObjsScript>().CallRope(this.gameObject);
             }
