@@ -1,0 +1,21 @@
+fileFormatVersion: 2
+guid: fb6c628c3e2a69443aec96bd2a3ec23f
+timeCreated: 1529596552
+licenseType: Free
+TrueTypeFontImporter:
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Dirty SevenOne
+  fontNames:
+  - Dirty SevenOne
+  fallbackFontReferences: []
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
