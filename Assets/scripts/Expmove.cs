@@ -290,7 +290,7 @@ public class Expmove : NetworkBehaviour
         if (reviving)
         {
             if (!onfriendrevival || dead)
-                reviving = false;
+                CmdIAmReviving(false);
         }
 
         if(dead)
@@ -348,7 +348,7 @@ public class Expmove : NetworkBehaviour
                     onfriendrevival = true;
                     if (Input.GetKey("r"))
                     {
-                      CmdIAmReviving();
+                      CmdIAmReviving(true);
                     }
                 }
             }
@@ -358,6 +358,21 @@ public class Expmove : NetworkBehaviour
             }
             if (other.gameObject.tag == "enemy")
             {
+                if (other.gameObject.GetComponent<EspinhosoScript>())
+                {
+                    if (other.gameObject.GetComponent<EspinhosoScript>().stunned)
+                        return;
+                }
+                else if (other.gameObject.GetComponent<OwlScript>())
+                {
+                    if (other.gameObject.GetComponent<OwlScript>().stunned)
+                        return;
+                }
+                else if (other.gameObject.GetComponent<Clawscrip>())
+                {
+                    if (other.gameObject.GetComponent<Clawscrip>().stunned)
+                        return;
+                }
                 anim.SetBool("Dead", true);
                 CmdAttAnim(3);
                 CmdLifeStatus(true);
@@ -381,26 +396,31 @@ public class Expmove : NetworkBehaviour
 
     void OnTriggerExit2D(Collider2D other)
     {
-        if (other.gameObject.tag == "corda")
+        if (amilocalplayer)
         {
-            touchingrope = false;
-            this.gameObject.GetComponent<Rigidbody2D>().gravityScale = 1;
-            onrope = false;
-            anim.SetBool("Onrope", false);
-        }
-        if (other.gameObject.tag == "limit")
-        {
-            limited = false;
-        }
-        if (other.gameObject.tag == "revivalarea")
-        {
-            onfriendrevival = false;
+            if (other.gameObject.tag == "corda")
+            {
+                touchingrope = false;
+                this.gameObject.GetComponent<Rigidbody2D>().gravityScale = 1;
+                onrope = false;
+                anim.SetBool("Onrope", false);
+            }
+            if (other.gameObject.tag == "limit")
+            {
+                limited = false;
+            }
+            if (other.gameObject.tag == "revivalarea")
+            {
+                onfriendrevival = false;
+            }
         }
     }
 
     void OnCollisionEnter2D(Collision2D coll)
     {
-       
+        if (amilocalplayer)
+        {
+
             if (coll.gameObject.tag == "enemyattack")
             {
                 anim.SetBool("Dead", true);
@@ -409,13 +429,14 @@ public class Expmove : NetworkBehaviour
                 CmdDistress(true);
             }
 
-            if (coll.gameObject.tag == "chao" && vspeed <= -12)
+            if (coll.gameObject.tag == "chao" && vspeed <= -9)
             {
                 anim.SetBool("Dead", true);
                 CmdAttAnim(3);
                 CmdLifeStatus(true);
                 CmdDistress(true);
             }
+        }
         
     }
 
@@ -453,9 +474,9 @@ public class Expmove : NetworkBehaviour
     }
 
     [Command]
-    void CmdIAmReviving()
+    void CmdIAmReviving(bool yes)
     {
-        reviving = true;
+        reviving = yes;
     }
 
     [ClientRpc]
@@ -536,6 +557,12 @@ public class Expmove : NetworkBehaviour
     {        
         if (amilocalplayer)
             myparent.GetComponent<PlayerObjsScript>().stunMe(caller);
+    }
+
+    public void DestunMe(GameObject caller)
+    {
+        if (amilocalplayer)
+            myparent.GetComponent<PlayerObjsScript>().DestunMe(caller);
     }
 
     public void ShootSpine(GameObject caller, bool direction)

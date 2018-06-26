@@ -7,9 +7,7 @@ public class spinescript : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         
-          //  exp = GameObject.Find("Explorer(Clone)");
-
-          //  bird = GameObject.Find("Bird(Clone)");        
+           
     }
 	
 	// Update is called once per frame

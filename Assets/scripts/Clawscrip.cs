@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 
 public class Clawscrip : NetworkBehaviour {
-    public GameObject attackarea, explorer, bird;
+    public GameObject attackarea, explorer, bird,corpse;
     public float movespeed;
     float stuntimer;
     [SyncVar]
@@ -15,12 +15,15 @@ public class Clawscrip : NetworkBehaviour {
     public bool stunned;
     [SyncVar]
     public bool attacking;
+
+    Animator anim;
     // Use this for initialization
     void Start()
     {
         direction = true;
         attacktimer = 0;
         attacking = false;
+        anim = this.gameObject.GetComponent<Animator>();
     }
 
     // Update is called once per frame
@@ -43,6 +46,11 @@ public class Clawscrip : NetworkBehaviour {
             {
                 stunned = false;
                 stuntimer = 0;
+                anim.SetBool("stunned", false);
+                if (explorer != null)
+                    explorer.GetComponent<Expmove>().DestunMe(this.gameObject);
+                if (bird != null)
+                    bird.GetComponent<Birdmove>().DestunMe(this.gameObject);
             }
         }
         else
@@ -132,6 +140,8 @@ public class Clawscrip : NetworkBehaviour {
         }
         if (other.gameObject.tag == "ataquebi")
         {
+            anim.SetTrigger("stun");
+            anim.SetBool("stunned", true);
             if (explorer != null)
                 explorer.GetComponent<Expmove>().stunMe(this.gameObject);
             if (bird != null)

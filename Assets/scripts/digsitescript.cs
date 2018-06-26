@@ -15,6 +15,7 @@ public class digsitescript : NetworkBehaviour
     public GameObject icon;
     public GameObject bird;
     public GameObject explorer;
+    public Sprite dsprite;
     
     // Use this for initialization
     void Start()
@@ -48,7 +49,7 @@ public class digsitescript : NetworkBehaviour
         if(dug && !changed)
         {
             changed = true;
-            this.gameObject.GetComponent<SpriteRenderer>().color = new Color(0, 1.0f, 0);
+            this.gameObject.GetComponent<SpriteRenderer>().sprite = dsprite;
         }
     }
 

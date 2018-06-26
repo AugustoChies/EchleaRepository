@@ -5,16 +5,20 @@ using UnityEngine.Networking;
 
 public class OwlScript : NetworkBehaviour {
     public GameObject attackarea, explorer, bird;
-    public GameObject spine;
-    float stuntimer;
+    public GameObject spine,corpse;
+    [SyncVar]
+    public float stuntimer;
     [SyncVar]
     public float attacktimer;
     [SyncVar]
     public bool stunned;
+
+    Animator anim;
     // Use this for initialization
     void Start()
     {
-        attacktimer = 0;
+        stuntimer = attacktimer = 0;
+        anim = this.gameObject.GetComponent<Animator>();
     }
 
     // Update is called once per frame
@@ -36,6 +40,11 @@ public class OwlScript : NetworkBehaviour {
             {
                 stunned = false;
                 stuntimer = 0;
+                anim.SetBool("stunned", false);
+                if (explorer != null)
+                    explorer.GetComponent<Expmove>().DestunMe(this.gameObject);
+                if (bird != null)
+                    bird.GetComponent<Birdmove>().DestunMe(this.gameObject);
             }
         }
         else
@@ -44,13 +53,14 @@ public class OwlScript : NetworkBehaviour {
             {
                 if (attacktimer <= 0)
                 {
+                    anim.SetTrigger("attack");
                     if (explorer != null)
                         explorer.GetComponent<Expmove>().DropBall(this.gameObject);
                     if (bird != null)
                         bird.GetComponent<Birdmove>().DropBall(this.gameObject);
                     attacktimer = 2.5f;
                 }
-                this.gameObject.GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
+                               
             }
         }
 
@@ -62,7 +72,7 @@ public class OwlScript : NetworkBehaviour {
 
     void OnTriggerEnter2D(Collider2D other)
     {
-
+        
         if (other.gameObject.tag == "ataqueex")
         {
             if (explorer != null)
@@ -72,6 +82,9 @@ public class OwlScript : NetworkBehaviour {
         }
         if (other.gameObject.tag == "ataquebi")
         {
+           
+            anim.SetTrigger("stun");
+            anim.SetBool("stunned", true);
             if (explorer != null)
                 explorer.GetComponent<Expmove>().stunMe(this.gameObject);
             if (bird != null)

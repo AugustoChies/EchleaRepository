@@ -142,7 +142,7 @@ public class Birdmove : NetworkBehaviour {
                 this.gameObject.GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
                 canmove = false;
                 anim.SetBool("Deployed", true);
-                maincamera.gameObject.GetComponent<Camera>().orthographicSize = 5;
+                //maincamera.gameObject.GetComponent<Camera>().orthographicSize = 5;
                 CmdAttAnim(5);
                 myparent.GetComponent<PlayerObjsScript>().CallRope(this.gameObject);
             }
@@ -266,7 +266,7 @@ public class Birdmove : NetworkBehaviour {
         if (reviving)
         {
             if (!onfriendrevival || dead)
-                reviving = false;
+                CmdIAmReviving(false);
         }
     }
 
@@ -281,16 +281,34 @@ public class Birdmove : NetworkBehaviour {
                     onfriendrevival = true;
                     if (Input.GetKey("r"))
                     {
-                        CmdIAmReviving();
+                        CmdIAmReviving(true);
                     }
                 }
             }
             if (other.gameObject.tag == "enemy")
             {
-                CmdLifeStatus(true);
-                CmdDistress(true);
-                anim.SetBool("Dead", true);
-                CmdAttAnim(3);
+                if (attacktimer == -1)
+                {
+                    if (other.gameObject.GetComponent<EspinhosoScript>())
+                    {
+                        if (other.gameObject.GetComponent<EspinhosoScript>().stunned)
+                            return;
+                    }
+                    else if (other.gameObject.GetComponent<OwlScript>())
+                    {
+                        if (other.gameObject.GetComponent<OwlScript>().stunned)
+                            return;
+                    }
+                    else if (other.gameObject.GetComponent<Clawscrip>())
+                    {
+                        if (other.gameObject.GetComponent<Clawscrip>().stunned)
+                            return;
+                    }
+                    CmdLifeStatus(true);
+                    CmdDistress(true);
+                    anim.SetBool("Dead", true);
+                    CmdAttAnim(3);
+                }
             }
             if (other.gameObject.tag == "delivery")
             {
@@ -305,19 +323,23 @@ public class Birdmove : NetworkBehaviour {
     }
 
     void OnTriggerExit2D(Collider2D other)
-    {        
-        if (other.gameObject.tag == "revivalarea")
+    {
+        if (amilocalplayer)
         {
-            onfriendrevival = false;
+            if (other.gameObject.tag == "revivalarea")
+            {
+                onfriendrevival = false;
+            }
         }
     }
 
     void OnCollisionEnter2D(Collision2D coll)
-    {        
+    {
+        
             if (coll.gameObject.tag == "enemyattack")
             {
-                 CmdLifeStatus(true);
-                 CmdDistress(true);
+                CmdLifeStatus(true);
+                CmdDistress(true);
                 anim.SetBool("Dead", true);
                 CmdAttAnim(3);
 
@@ -328,6 +350,7 @@ public class Birdmove : NetworkBehaviour {
                 if (dead)
                     this.gameObject.GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
             }
+        
         
     }
 
@@ -415,9 +438,9 @@ public class Birdmove : NetworkBehaviour {
     }
 
     [Command]
-    void CmdIAmReviving()
+    void CmdIAmReviving(bool yes)
     {
-        reviving = true;
+        reviving = yes;
     }
 
     [ClientRpc]
@@ -470,6 +493,12 @@ public class Birdmove : NetworkBehaviour {
     {
         if (amilocalplayer)
             myparent.GetComponent<PlayerObjsScript>().stunMe(caller);
+    }
+
+    public void DestunMe(GameObject caller)
+    {
+        if (amilocalplayer)
+            myparent.GetComponent<PlayerObjsScript>().DestunMe(caller);
     }
 
     public void ShootSpine(GameObject caller, bool direction)

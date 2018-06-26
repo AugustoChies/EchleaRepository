@@ -220,6 +220,13 @@ public class PlayerObjsScript : NetworkBehaviour {
             CmdStun(objectID);
     }
 
+    public void DestunMe(GameObject caller)
+    {
+        objectID = caller;
+
+        CmdDestun(objectID);
+    }
+
     public void ShootSpine(GameObject caller, bool direction)
     {
         objectID = caller;
@@ -329,7 +336,7 @@ public class PlayerObjsScript : NetworkBehaviour {
         NetworkIdentity objNetId = caller.GetComponent<NetworkIdentity>();
         objNetId.AssignClientAuthority(connectionToClient);
         caller.GetComponent<digsitescript>().dug = true;
-        GameObject instance = Instantiate(caller.GetComponent<digsitescript>().icon, caller.transform.position + new Vector3(0, 2, -1), Quaternion.identity);
+        GameObject instance = Instantiate(caller.GetComponent<digsitescript>().icon, caller.transform.position + new Vector3(0, 1, -1), Quaternion.identity);
         NetworkServer.Spawn(instance);
         objNetId.RemoveClientAuthority(connectionToClient);
 
@@ -398,7 +405,52 @@ public class PlayerObjsScript : NetworkBehaviour {
     [Command]
     void CmdDestroy(GameObject caller)
     {
+        if (caller.GetComponent<EspinhosoScript>())
+        {
+            GameObject instance = Instantiate(caller.GetComponent<EspinhosoScript>().corpse, caller.transform.position, Quaternion.identity);         
+            NetworkServer.Spawn(instance);
+        }
+        else if (caller.GetComponent<OwlScript>())
+        {
+            GameObject instance = Instantiate(caller.GetComponent<OwlScript>().corpse, caller.transform.position, Quaternion.identity);
+            NetworkServer.Spawn(instance);
+        }
+        else if (caller.GetComponent<Clawscrip>())
+        {
+            GameObject instance = Instantiate(caller.GetComponent<Clawscrip>().corpse, caller.transform.position, Quaternion.identity);
+            NetworkServer.Spawn(instance);
+        }
+
         NetworkServer.Destroy(caller);
+    }
+
+    [ClientRpc]
+    void RpccallstunTrigger(GameObject caller,bool yes)
+    {
+        caller.GetComponent<Animator>().SetBool("stunned",yes);
+        if(yes)
+          caller.GetComponent<Animator>().SetTrigger("stun");
+    }
+
+    [Command]
+    void CmdDestun(GameObject caller)
+    {
+        if (caller.GetComponent<EspinhosoScript>())
+        {
+            caller.GetComponent<EspinhosoScript>().stunned = false;
+            RpccallstunTrigger(caller, false);
+        }
+        else if (caller.GetComponent<OwlScript>())
+        {
+            caller.GetComponent<OwlScript>().stunned = false;
+            RpccallstunTrigger(caller, false);
+        }
+        else if (caller.GetComponent<Clawscrip>())
+        {
+            caller.GetComponent<Clawscrip>().stunned = false;
+            RpccallstunTrigger(caller, false);
+        }
+        
     }
 
     [Command]
@@ -411,15 +463,18 @@ public class PlayerObjsScript : NetworkBehaviour {
         {
             caller.GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
             caller.GetComponent<EspinhosoScript>().stunned = true;
+            RpccallstunTrigger(caller,true);
         }
         else if (caller.GetComponent<OwlScript>())
         {
             caller.GetComponent<OwlScript>().stunned = true;
+            RpccallstunTrigger(caller, true);
         }
         else if (caller.GetComponent<Clawscrip>())
         {
             caller.GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
             caller.GetComponent<Clawscrip>().stunned = true;
+            RpccallstunTrigger(caller, true);
         }
         objNetId.RemoveClientAuthority(connectionToClient);
     }

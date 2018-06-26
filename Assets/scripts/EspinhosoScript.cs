@@ -6,7 +6,7 @@ using UnityEngine.Networking;
 public class EspinhosoScript : NetworkBehaviour {
     public GameObject hissarea, attackarea, explorer, bird;
     public float movespeed;
-    public GameObject spine;
+    public GameObject spine,corpse;
     float stuntimer;
     [SyncVar]
     bool direction;
@@ -14,11 +14,14 @@ public class EspinhosoScript : NetworkBehaviour {
     public float attacktimer;
     [SyncVar]
     public bool stunned;
-	// Use this for initialization
-	void Start () {
+
+    Animator anim;
+    // Use this for initialization
+    void Start () {
         direction = true;
         attacktimer = 0;
-	}
+        anim = this.gameObject.GetComponent<Animator>();
+    }
 	
 	// Update is called once per frame
 	void Update () {
@@ -33,20 +36,28 @@ public class EspinhosoScript : NetworkBehaviour {
         }
         if (stunned)
         {
+            anim.SetBool("hissing", false);
             this.gameObject.GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
             stuntimer += 1 * Time.deltaTime;
             if(stuntimer > 2)
             {
                 stunned = false;
                 stuntimer = 0;
+                anim.SetBool("stunned", false);
+                if (explorer != null)
+                    explorer.GetComponent<Expmove>().DestunMe(this.gameObject);
+                if (bird != null)
+                    bird.GetComponent<Birdmove>().DestunMe(this.gameObject);
             }
         }
         else
         {
             if (attackarea.GetComponent<PlayerDetector>().detected)
             {
-                if(attacktimer <= 0)
+                anim.SetBool("hissing", false);
+                if (attacktimer <= 0)
                 {
+                    anim.SetTrigger("attack");
                     if (explorer != null)
                         explorer.GetComponent<Expmove>().ShootSpine(this.gameObject,direction);
                     if (bird != null)
@@ -57,15 +68,18 @@ public class EspinhosoScript : NetworkBehaviour {
             }
             else if (hissarea.GetComponent<PlayerDetector>().detected)
             {
+                anim.SetBool("hissing",true);
                 this.gameObject.GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
             }
             else if (direction)
             {
+                anim.SetBool("hissing", false);
                 this.gameObject.GetComponent<SpriteRenderer>().flipX = false;
                 this.gameObject.GetComponent<Rigidbody2D>().velocity = new Vector2(1 * movespeed, 0);
             }
             else
             {
+                anim.SetBool("hissing", false);
                 this.gameObject.GetComponent<SpriteRenderer>().flipX = true;
                 this.gameObject.GetComponent<Rigidbody2D>().velocity = new Vector2(-1 * movespeed, 0);
             }
@@ -85,13 +99,13 @@ public class EspinhosoScript : NetworkBehaviour {
             
             if (direction)
             {
-                hissarea.transform.localPosition = new Vector3(3.15f, 0);
-                attackarea.transform.localPosition = new Vector3(1.7f, 0);
+                hissarea.transform.localPosition = new Vector3(6.14f, 2.1f);
+                attackarea.transform.localPosition = new Vector3(3.8f, 0.62f);
             }
             else
             {
-                hissarea.transform.localPosition = new Vector3(-3.15f, 0);
-                attackarea.transform.localPosition = new Vector3(-1.7f, 0);
+                hissarea.transform.localPosition = new Vector3(-6.14f, 2.1f);
+                attackarea.transform.localPosition = new Vector3(-3.8f, 0.62f);
             }
         }
 
@@ -104,6 +118,8 @@ public class EspinhosoScript : NetworkBehaviour {
         }
         if (other.gameObject.tag == "ataquebi")
         {
+            anim.SetTrigger("stun");
+            anim.SetBool("stunned", true);
             if (explorer != null)
                 explorer.GetComponent<Expmove>().stunMe(this.gameObject);
             if (bird != null)
