@@ -37,7 +37,7 @@ public class NMOverwriter : NetworkManager
     public void DisconnectCall()
     {        
         NetworkManager.singleton.StopHost();
-        MasterServer.UnregisterHost();
+       // MasterServer.UnregisterHost();
     }
 
     public void SwapChars(bool nchar1,bool nchar2)
