@@ -115,7 +115,7 @@ public class MenuPlayScript : MonoBehaviour {
             if (netmanager.GetComponent<NMOverwriter>().numPlayers == 2)
             {
                 netmanager.GetComponent<NMOverwriter>().SwapChars(char1, char2);
-                netmanager.GetComponent<NMOverwriter>().ChangeScene("Stage2");
+                netmanager.GetComponent<NMOverwriter>().ChangeScene("Stage1");
             }
             else
             {
