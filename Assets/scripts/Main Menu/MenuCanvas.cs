@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 
 public class MenuCanvas : MonoBehaviour {
 
+    public GameObject titleimg, creditsimg, controlsimg;
     public GameObject title, credits, controlsexp, controlsbird;
     public GameObject startb, creditsb, controlsb, exitb, backb;
 	// Use this for initialization
@@ -25,6 +26,9 @@ public class MenuCanvas : MonoBehaviour {
     public void Credits_Button()
     {
         title.SetActive(false);
+        titleimg.SetActive(false);
+        controlsimg.SetActive(false);
+        creditsimg.SetActive(true);
         credits.SetActive(true);
 
         startb.SetActive(false);
@@ -40,6 +44,10 @@ public class MenuCanvas : MonoBehaviour {
         title.SetActive(false);
         controlsbird.SetActive(true);
         controlsexp.SetActive(true);
+
+        titleimg.SetActive(false);
+        controlsimg.SetActive(true);
+        creditsimg.SetActive(false);
 
         startb.SetActive(false);
         creditsb.SetActive(false);
@@ -60,6 +68,10 @@ public class MenuCanvas : MonoBehaviour {
         credits.SetActive(false);
         controlsbird.SetActive(false);
         controlsexp.SetActive(false);
+
+        titleimg.SetActive(true);
+        controlsimg.SetActive(false);
+        creditsimg.SetActive(false);
 
         startb.SetActive(true);
         creditsb.SetActive(true);
