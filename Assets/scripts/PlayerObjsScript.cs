@@ -487,9 +487,14 @@ public class PlayerObjsScript : NetworkBehaviour {
         caller.GetComponent<EspinhosoScript>().attacktimer = 1.5f;
         GameObject instance = Instantiate(caller.GetComponent<EspinhosoScript>().spine, caller.transform.position + new Vector3(0, 0.5f, 0), Quaternion.identity);
         if (direction)
+        {
             instance.GetComponent<Rigidbody2D>().AddForce(new Vector2(700, 100));
+            instance.GetComponent<spinescript>().direction = true;
+        }
         else
+        {
             instance.GetComponent<Rigidbody2D>().AddForce(new Vector2(-700, 100));
+        }
         NetworkServer.Spawn(instance);
         objNetId.RemoveClientAuthority(connectionToClient);
     }
