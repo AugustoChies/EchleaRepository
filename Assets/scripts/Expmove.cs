@@ -219,6 +219,7 @@ public class Expmove : NetworkBehaviour
 
         if (Input.GetKeyDown("p"))
         {
+            this.gameObject.GetComponent<AudioSource>().Play();
             CmdDistress(true);
         }
 

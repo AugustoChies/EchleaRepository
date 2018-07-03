@@ -5,8 +5,8 @@ using UnityEngine.Networking;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
-public class CanvasScript : NetworkBehaviour {
-    public GameObject cursetxt, keystxt;
+public class CanvasScript : NetworkBehaviour { 
+    public GameObject cursebar, keypart1, keypart2, fullkey;
     [SyncVar]
     public int keys;
     public bool relic1, relic2, relic3, relic4, relic5, relic6, relic7, relic8, relic9;
@@ -54,6 +54,9 @@ public class CanvasScript : NetworkBehaviour {
             curserate = 0.1f;
             curse = 0;
             spawned = false;
+            keypart1.SetActive(false);
+            keypart2.SetActive(false);
+            fullkey.SetActive(false);
         }
 
         if (bird == null)
@@ -62,12 +65,23 @@ public class CanvasScript : NetworkBehaviour {
         }
         curse += curserate * Time.deltaTime;
 
-        cursetxt.GetComponent<Text>().text = "" + (int)curse;
-        keystxt.GetComponent<Text>().text = "" + keys;
+        cursebar.GetComponent<Image>().fillAmount = curse / 150;
+
+        if(keys > 0)
+        {
+            keypart1.SetActive(true);
+            if (keys > 1)
+            {
+                keypart2.SetActive(true);
+                if (keys > 2)
+                    fullkey.SetActive(true);
+            }
+        }
 
         if(curse > 150 && !spawned)
         {
             spawned = true;
+            Destroy(GameObject.Find("Music"));
             if (explorer != null)
                 explorer.GetComponent<Expmove>().CallCurse(this.gameObject);
             if (bird != null)

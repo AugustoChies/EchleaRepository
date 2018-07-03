@@ -49,7 +49,7 @@ public class Inventoryscr : NetworkBehaviour {
 	void Update () {
         if (explorer == null)
         {
-            if (!(SceneManager.GetActiveScene().name == "Stage1" || SceneManager.GetActiveScene().name == "Stage2" || SceneManager.GetActiveScene().name == "Stage3"))
+            if (!(SceneManager.GetActiveScene().name == "Stage1" || SceneManager.GetActiveScene().name == "Stage2" || SceneManager.GetActiveScene().name == "Stage3" || SceneManager.GetActiveScene().name == "WinScreen"))
             {
                 Destroy(this.gameObject);
             }

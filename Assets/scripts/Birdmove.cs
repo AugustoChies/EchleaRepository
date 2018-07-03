@@ -184,6 +184,7 @@ public class Birdmove : NetworkBehaviour {
 
         if (Input.GetKeyDown("p"))
         {
+            this.gameObject.GetComponent<AudioSource>().Play();
             CmdDistress(true);
         }
 
@@ -211,7 +212,7 @@ public class Birdmove : NetworkBehaviour {
         }
 
         if (explorer != null && explorer.GetComponent<Expmove>().distress)
-        {
+        {           
             pointer.GetComponent<SpriteRenderer>().enabled = true;
 
             Vector3 targ = explorer.transform.position;
