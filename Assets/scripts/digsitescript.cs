@@ -38,6 +38,11 @@ public class digsitescript : NetworkBehaviour
             bird = GameObject.Find("Bird(Clone)");
         }
 
+        if (inventory == null)
+        {
+            inventory = GameObject.Find("InventoryInfo");
+        }
+
         if (scannetimer >= 0)
         {
             scannetimer += 1 * Time.deltaTime;
